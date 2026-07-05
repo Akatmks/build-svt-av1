@@ -61,6 +61,7 @@ run:
       path: ${{ inputs.path }}/PGO
       repository: Akatmks/build-svt-av1
       ref: ${{ inputs.pgo-video }}
+      lfs: true
     if: ${{ inputs.pgo-video != "false" }}
   - run: ffmpeg -i PGO.mkv -strict -1 -f yuv4mpegpipe -pix_fmt yuv420p10le PGO.y4m
     working-directory: ${{ inputs.path }}/PGO
@@ -127,6 +128,6 @@ run:
     if: ${{ runner.os == "Windows" && runner.arch == "X64" && inputs.dovi-hdr10plus != "false" }}
 
 
-  # - run: fish macos-arm64.fish --static=${{ inputs.static }} --shared=${{ inputs.shared }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --cxxflags-profiling=${{ inputs.cxxflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --cxxflags-final=${{ inputs.cxxflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
-  #   working-directory: ${{ inputs.path }}
-  #   if: ${{ runner.os == "macOS" && runner.arch == "ARM64" }}
+  - run: fish "$GITHUB_ACTION_PATH/macos-arm64.fish" --static=${{ inputs.static }} --shared=${{ inputs.shared }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --cxxflags-profiling=${{ inputs.cxxflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --cxxflags-final=${{ inputs.cxxflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
+    working-directory: ${{ inputs.path }}
+    if: ${{ runner.os == "macOS" && runner.arch == "ARM64" }}
