@@ -75,10 +75,13 @@ runs:
     if: ${{ runner.os == 'Linux' }}
 
 
-  - run: pacman --noconfirm -S ffmpeg
+  - run: pacman --noconfirm -S mingw-w64-ucrt-x86_64-ffmpeg
     shell: msys2 {0}
-    if: ${{ runner.os == 'Windows' && inputs.pgo-video != 'false' }}
-  - run: apt install -y ffmpeg
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.pgo-video != 'false' }}
+  - run: pacman --noconfirm -S mingw-w64-clang-aarch64-ffmpeg
+    shell: msys2 {0}
+    if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.pgo-video != 'false' }}
+  - run: sudo apt install -y ffmpeg
     shell: bash
     if: ${{ runner.os == 'Linux' && inputs.pgo-video != 'false' }}
   - run: brew install ffmpeg
@@ -188,23 +191,23 @@ runs:
       path: ${{ inputs.path }}/dovi_tool
       repository: quietvoid/dovi_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../BuildAction)"
     shell: msys2 {0}
     working-directory: ${{ inputs.path }}/dovi_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../BuildAction)"
     shell: msys2 {0}
     working-directory: ${{ inputs.path }}/dovi_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath .)/BuildAction"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ..)/BuildAction"
     shell: bash
     working-directory: ${{ inputs.path }}/dovi_tool
     if: ${{ runner.os == 'Linux' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath .)/BuildAction"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ..)/BuildAction"
     shell: bash
     working-directory: ${{ inputs.path }}/dovi_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath .)/BuildAction"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ..)/BuildAction"
     shell: bash
     working-directory: ${{ inputs.path }}/dovi_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
@@ -213,23 +216,23 @@ runs:
       path: ${{ inputs.path }}/hdr10plus_tool
       repository: quietvoid/hdr10plus_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../BuildAction)"
     shell: msys2 {0}
     working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../BuildAction)"
     shell: msys2 {0}
     working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath .)/BuildAction"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ..)/BuildAction"
     shell: bash
     working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ runner.os == 'Linux' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath .)/BuildAction"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ..)/BuildAction"
     shell: bash
     working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath .)/BuildAction"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ..)/BuildAction"
     shell: bash
     working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
