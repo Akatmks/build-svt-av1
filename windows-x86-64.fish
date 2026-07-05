@@ -59,10 +59,11 @@ function parameters_base
     set -g -a ldflags -fuse-ld=lld
 
     if test $flag_dovi_hdr10plus != "false"
-        set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1 (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/dovi.pc)
+        set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1 (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
         set -g -a ldflags (pkg-config --libs --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
     end
     set -g -a cflags -DNDEBUG -O3 -fno-exceptions -fno-rtti -fno-stack-protector -fno-sanitize=all -fno-dwarf2-cfi-asm -Wno-deprecated
+    set -g -a cflags $cflags_arch
     if test $argv[2] = "profiling"
         set -g -a cflags -flto=full -fwhole-program-vtables
         set -g -a ldflags -flto=full -fwhole-program-vtables
@@ -86,16 +87,16 @@ end
 # $argv[1]: static: "static", "shared"
 # $argv[2]: PGO: "profiling", "final"
 function parameters_icelake_server_znver5
+    set -g cflags_arch -march=icelake-server -mtune=znver5 -mprefer-vector-width=512
     parameters_base $argv[1] $argv[2]
-    set -g -a cflags "-march=icelake-server -mtune=znver5 -mprefer-vector-width=512"
 end
 function parameters_znver2
+    set -g cflags_arch -march=znver2 -mtune=znver2
     parameters_base $argv[1] $argv[2]
-    set -g -a cflags "-march=znver2 -mtune=znver2"
 end
 function parameters_x86_64_v3_znver2
+    set -g cflags_arch -march=x86-64-v3 -mtune=znver2 -mno-gather
     parameters_base $argv[1] $argv[2]
-    set -g -a cflags "-march=x86-64-v3 -mtune=znver2 -mno-gather"
 end
 
 function build
@@ -176,7 +177,7 @@ function pgo_build
         or return $status
 
         echo "[build-svt-av1] Result shared $argv[1]"
-        find BuildAction/$argv[1]/shared -name "*"
+        find BuildAction/$argv[1]/shared -type f
     end
 end
 

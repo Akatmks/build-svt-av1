@@ -4,35 +4,35 @@ author: Akatsumekusa and contributors
 inputs:
   path:
     type: string
-    default: .
+    default: "."
 
   static:
     type: string
-    default: true
+    default: "true"
 
   shared:
     type: string
-    default: false
+    default: "false"
 
   pgo-video:
     type: string
-    default: SolLevante
+    default: "SolLevante"
 
   pgo-parameters:
     type: string
-    default: --crf 20 --tune 0
+    default: "--crf 20 --tune 0"
 
   base-arch-only:
     type: string
-    default: false
+    default: "false"
 
   dovi-hdr10plus:
     type: string
-    default: true
+    default: "true"
 
   ffms2:
     type: string
-    default: false
+    default: "false"
 
   cmakeflags:
     type: string
