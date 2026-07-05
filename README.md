@@ -1,25 +1,23 @@
-## Akatmks/build-svt-av1@v1
+# Akatmks/build-svt-av1
 
-This is a GitHub Action to build SVT-AV1 for Windows x86-64, Windows arm64, Linux x86-64, macOS arm64, and macOS x86-64.  
+This is a GitHub Action to build SVT-AV1 for Windows x86-64 & arm64, Linux x86-64, and macOS arm64 & x86-64.  
 By utilising the best compiler and best procedure, including LTO and PGO, this building script can create highly optimised builds within 1% of the best possible build.  
 
-SVT-AV1 variants and build repositories using this action:  
-* [5fish/SVT-AV1](https://github.com/5fish/SVT-AV1)  
+SVT-AV1 variants and build repositories using this action or currently in the process of implementing this action:  
+– [5fish/SVT-AV1](https://github.com/5fish/SVT-AV1)  
+– [SVT-AV1-HDR](https://github.com/juliobbv-p/svt-av1-hdr)  
+– [SVT-AV1-Tritium](https://github.com/Uranite/svt-av1-tritium)  
 
-SVT-AV1 variants and build repositories that is currently in the process of implementing this action:  
-* SVT-AV1-HDR  
-* SVT-AV1-Tritium  
+## Usage
 
-### Usage
-
-Please check the GitHub Workflow in the various linked repositories above to see how this action is used.  
+Please check the GitHub Workflow in the various repositories linked above to see how this action is used.  
 
 This action will install clang, nasm, rust, as well as ffmpeg, MSYS2, and other components all on its own.  
-If you want to link the static lib built by this action into other projects, you can use the same clang this action leaves to build it, but do check the code for how or which clang to use.  
+If you want to link the static lib built by this action into other projects, you can use the same clang this action leaves to build it, but do check the actual implementation for how or which clang to use.  
 
-Please read through this entire Usage section including the maintainence information at the end.  
+Make sure you check the Maintainence section at the end.  
 
-#### Reference  
+### Reference  
 
 ```yml
 - uses: Akatmks/build-svt-av1@v1
@@ -75,7 +73,7 @@ Please read through this entire Usage section including the maintainence informa
     ldflags-final: ""
 ```
 
-#### Results  
+### Results  
 
 The resulting builds will be available in the following directory within the SVT-AV1 repository.  
 ```
@@ -89,17 +87,9 @@ BuildAction/[ARCH]/[STATIC]/[FILENAME]
 * `[STATIC]`: `static` or `shared`.  
 * `[FILENAME]`:
   * For the app, it would be `SvtAv1EncApp.exe` on Windows, and `SvtAv1EncApp` on Unix.  
-  * For the lib, it would the respective native filename for the system, such as `libSvtAv1Enc.a`, `libSvtAv1EncApp.so`, `libSvtAv1EncApp.VERSION.so`. You can directly `-L` to the directory.  
+  * For the lib, it would the respective native filename for the system, such as `libSvtAv1Enc.a`, `libSvtAv1EncApp.so`, `libSvtAv1EncApp.VERSION.so`. You can directly `-L` to the directory as well.  
 
-#### Maintainence
-
-A new main version (such as `Akatmks/build-svt-av1@v1` ⇒ `Akatmks/build-svt-av1@v2`) will be released when:  
-* We change the `-march` and `-mtune` in any of the builds, either due to new clang version having different preference, or due to GitHub Actions server upgrading to a different hardware.  
-  When you're updating, make sure you update the output binary path as explained [above](#results).  
-* We change the compiler used in any of the builds, such as changing from `clang` & `clang++` to `clang-cl`, or changing from LLVM project clang to Intel/LLVM.  
-  This doesn't affect people using the app, but for people using the static lib, make sure things are still working.  
-
-#### Note
+### Note
 
 This is not a requirement, but when you're using this action to build anything, we kindly ask you to include this message when distributing your builds.  
 ```
@@ -108,6 +98,16 @@ Thanks to studies and contributions from afed, Emre, Ironclad, Itachi Uchiha, Kh
 You may rephrase the sentence if needed.  
 You can also add additional names, including your own, to the list. The list is currently sorted in alphabetical order.  
 
-### Contribution
+### Maintainence
+
+A new main version (such as `Akatmks/build-svt-av1@v1` → `Akatmks/build-svt-av1@v2`) will be released when:  
+* We change the `-march` and `-mtune` in any of the builds, either due to new clang versions having different preference, or due to [GitHub-hosted runners](https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories) upgrading to a different hardware.  
+  In this case the output binary path explained in the [Results](#results) section will be changed. Please follow the list of items below to update.  
+* We change the compiler used in any of the builds, such as changing from `clang` & `clang++` to `clang-cl`, or changing from LLVM project clang to Intel oneAPI DPC++ Compiler.  
+  This doesn't affect people using the app, but for people using the static lib, make sure things are still working.
+
+Here is a complete list of items to update when upgrading `Akatmks/build-svt-av1`: (currently empty because we're on `v1`)  
+
+## Contribution
 
 If you can optimise this building process in any way, such as optimising compiling parameters and change optimisation processes, feel free to raise a discussion in the AV1 related servers, or open a pull request here.  
