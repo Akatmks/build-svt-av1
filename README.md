@@ -79,7 +79,7 @@ Make sure you check the Maintainence section at the end.
 
 ### Results  
 
-The resulting builds will be available in the following directory within the SVT-AV1 repository.  
+The binaries will be available in the following directory within the SVT-AV1 repository.  
 ```
 BuildAction/[ARCH]/[STATIC]/[FILENAME]
 ```
@@ -91,7 +91,9 @@ BuildAction/[ARCH]/[STATIC]/[FILENAME]
 * `[STATIC]`: `static` or `shared`.  
 * `[FILENAME]`:
   * For the app, it would be `SvtAv1EncApp.exe` on Windows, and `SvtAv1EncApp` on Unix.  
-  * For the lib, it would the respective native filename for the system, such as `libSvtAv1Enc.a`, `libSvtAv1EncApp.so`, `libSvtAv1EncApp.VERSION.so`. You can directly `-L` to the directory as well.  
+  * For the lib, it would the respective native filename for the system. You can directly `-L` to the directory as well.  
+
+You can also search for `[build-svt-av1] Result` in the logs. There will be a line starting with `[build-svt-av1] Result` for each `[ARCH]` and `[STATIC]` listing all the resulting binaries.  
 
 ### Note
 

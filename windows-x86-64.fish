@@ -37,7 +37,7 @@ function parameters_base
     set -g ldflags
 
     set -g -a cmake_command cmake --fresh -B svt_build -G Ninja -DCMAKE_BUILD_TYPE=Release
-    if test $argv[1] == "static"
+    if test $argv[1] = "static"
         set -g -a cmake_command -DBUILD_SHARED_LIBS=OFF -DBUILD_APPS=ON
     else
         set -g -a cmake_command -DBUILD_SHARED_LIBS=ON -DBUILD_APPS=ON
@@ -51,19 +51,19 @@ function parameters_base
         set -g -a ldflags (pkg-config --libs --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
     end
     set -g -a cflags -DNDEBUG -O3 -fno-exceptions -fno-rtti -fno-stack-protector -fno-sanitize=all -fno-dwarf2-cfi-asm -Wno-deprecated
-    if test $argv[2] == "profiling"
+    if test $argv[2] = "profiling"
         set -g -a cflags -flto=full -fwhole-program-vtables
         set -g -a ldflags -flto=full -fwhole-program-vtables
     else
         set -g -a cflags -flto=full -fwhole-program-vtables -fvisibility=hidden -fvisibility-inlines-hidden
         set -g -a ldflags -flto=full -fwhole-program-vtables -fvisibility=hidden -fvisibility-inlines-hidden
     end
-    if test $argv[2] == "profiling"
+    if test $argv[2] = "profiling"
         set -g -a cflags -fprofile-generate=PGO -ftemporal-profile
     else
         set -g -a cflags -fprofile-use=(cygpath -m -a PGO/default.profdata)
     end
-    if test $argv[2] == "profiling"
+    if test $argv[2] = "profiling"
         set -g -a cflags $_flag_cflags_profiling
         set -g -a ldflags $_flag_ldflags_profiling
     else
@@ -87,9 +87,10 @@ function parameters_x86_64_v3_znver2
 end
 
 function build
-    set -g build_command $cmake_command -DCMAKE_C_FLAGS_RELEASE=$cflags -DCMAKE_CXX_FLAGS_RELEASE=$cflags -DCMAKE_EXE_LINKER_FLAGS_RELEASE=$ldflags $_flag_cmakeflags && ninja -v -C svt_build
-    echo $build_command
-    $build_command
+    set cmake_command $cmake_command -DCMAKE_C_FLAGS_RELEASE=$cflags -DCMAKE_CXX_FLAGS_RELEASE=$cflags -DCMAKE_EXE_LINKER_FLAGS_RELEASE=$ldflags $_flag_cmakeflags
+    echo $cmake_command
+    $cmake_command
+    and ninja -v -C svt_build
     or return $status
 end
 
@@ -137,6 +138,9 @@ function pgo_build
         or return $status
         BuildAction/$argv[1]/static/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $_flag_pgo_parameters --preset 4
         or return $status
+
+        echo "[build-svt-av1] Result static $argv[1]"
+        find BuildAction/$argv[1]/static -name "*"
     end
     if test $_flag_shared != "false"
         rm -rf svt_build Build
@@ -158,6 +162,9 @@ function pgo_build
         or return $status
         BuildAction/$argv[1]/shared/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $_flag_pgo_parameters --preset 4
         or return $status
+
+        echo "[build-svt-av1] Result shared $argv[1]"
+        find BuildAction/$argv[1]/shared -name "*"
     end
 end
 
