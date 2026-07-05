@@ -176,6 +176,12 @@ runs:
     if: ${{ runner.os == 'Windows' }}
 
 
+  - run: pacman --noconfirm -S mingw-w64-ucrt-x86_64-pkgconf
+    shell: msys2 {0}
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
+  - run: pacman --noconfirm -S mingw-w64-clang-aarch64-pkgconf
+    shell: msys2 {0}
+    if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
   - uses: dtolnay/rust-toolchain@stable
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
   - uses: cargo-bins/cargo-binstall@main
