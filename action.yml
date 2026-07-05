@@ -3,39 +3,52 @@ description: Create highly optimised Windows, Linux, and macOS builds for SVT-AV
 author: Akatsumekusa and contributors
 inputs:
   path:
-    default: "."
+    type: string
+    default: .
 
   static:
-    default: "true"
+    type: string
+    default: true
 
   shared:
-    default: 'false'
+    type: string
+    default: false
 
   pgo-video:
-    default: "SolLevante"
+    type: string
+    default: SolLevante
 
   pgo-parameters:
-    default: "--crf 20 --tune 0"
+    type: string
+    default: --crf 20 --tune 0
 
   base-arch-only:
-    default: 'false'
+    type: string
+    default: false
 
   dovi-hdr10plus:
-    default: "true"
+    type: string
+    default: true
 
   ffms2:
-    default: 'false'
+    type: string
+    default: false
 
   cmakeflags:
+    type: string
     default: ""
 
   cflags-profiling:
+    type: string
     default: ""
   ldflags-profiling:
+    type: string
     default: ""
   cflags-final:
+    type: string
     default: ""
   ldflags-final:
+    type: string
     default: ""
 
 runs:
@@ -108,66 +121,66 @@ runs:
   - id: install-llvm-30
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "30"
+      version: 30
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
   - id: install-llvm-29
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "29"
+      version: 29
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-30.outcome == 'failure' }}
   - id: install-llvm-28
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "28"
+      version: 28
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-29.outcome == 'failure' }}
   - id: install-llvm-27
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "27"
+      version: 27
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-28.outcome == 'failure' }}
   - id: install-llvm-26
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "26"
+      version: 26
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-27.outcome == 'failure' }}
   - id: install-llvm-25
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "25"
+      version: 25
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-26.outcome == 'failure' }}
   - id: install-llvm-24
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "24"
+      version: 24
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-25.outcome == 'failure' }}
   - id: install-llvm-23
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "23"
+      version: 23
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-24.outcome == 'failure' }}
   - id: install-llvm-22
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "22"
+      version: 22
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-23.outcome == 'failure' }}
   - id: install-llvm-21
     uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "21"
+      version: 21
     continue-on-error: true
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-22.outcome == 'failure' }}
   - uses: KyleMayes/install-llvm-action@v2
     with:
-      version: "20"
+      version: 20
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-21.outcome == 'failure' }}
   - run: brew install llvm lld
     shell: bash
