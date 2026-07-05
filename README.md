@@ -40,9 +40,15 @@ Make sure you check the Maintainence section at the end.
     # Currently we perform PGO using either a clip of SolLevante or a clip of FoodMarket2.
     # Use "SolLevante" if this build will more likely be used to encode 2D content such as anime or some genre of games.
     # Use "FoodMarket2" if this build will more likely be used to encode liveaction and 3D content.
-    # You can also set this to "false" and put your own PGO clip in `PGO/PGO.y4m` in the SVT-AV1 repository. 
-    # Default: "SolLevante"
+    # You can also set this to "false" and put your own PGO clip in `PGO/PGO.y4m` in the SVT-AV1 repository.
+    # Default: "SolLevante" [You should configure this properly]
     pgo-video: "SolLevante"
+
+    # PGO and binary check parameters.
+    # You should use a parameter that's typical for this encoder.
+    # Do NOT set `--preset` or equivalent parameters such as `--speed` in SVT-AV1-Essential.
+    # Default: "--crf 20 --tune 0" [You should configure this and not use default]
+    pgo-parameters: "--crf 20 --tune 0"
 
     # We currently provide multiple builds for different generations of x86-64 systems.
     # Set this to true to only build `x86-64-v3+znver2` version.
@@ -62,14 +68,12 @@ Make sure you check the Maintainence section at the end.
     # Default: ""
     cmakeflags: ""
 
-    # Additional CFLAGS, CXXFLAGS, LDFLAGS for profiling and final build.
+    # Additional CFLAGS (CXXFLAGS), LDFLAGS for profiling and final build.
     # Please escape all quotation marks using backslashes `\`.
     # Default: ""
     cflags-profiling: ""
-    cxxflags-profiling: ""
     ldflags-profiling: ""
     cflags-final: ""
-    cxxflags-final: ""
     ldflags-final: ""
 ```
 

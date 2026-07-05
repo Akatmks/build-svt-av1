@@ -14,6 +14,9 @@ inputs:
   pgo-video:
     default: "SolLevante"
 
+  pgo-parameters:
+    default: "--crf 20 --tune 0"
+
   base-arch-only:
     default: 'false'
 
@@ -28,13 +31,9 @@ inputs:
 
   cflags-profiling:
     default: ""
-  cxxflags-profiling:
-    default: ""
   ldflags-profiling:
     default: ""
   cflags-final:
-    default: ""
-  cxxflags-final:
     default: ""
   ldflags-final:
     default: ""
@@ -44,15 +43,44 @@ runs:
   steps:
 
 
+  - uses: msys2/setup-msys2@v2
+    with:
+      msystem: UCRT64
+      path-type: inherit
+      install: >-
+        mingw-w64-ucrt-x86_64-fastfetch
+        mingw-w64-ucrt-x86_64-fish
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
+  - uses: msys2/setup-msys2@v2
+    with:
+      msystem: CLANGARM64
+      path-type: inherit
+      install: >-
+        mingw-w64-clang-aarch64-fastfetch
+        mingw-w64-clang-aarch64-fish
+    if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
+  - uses: ConorMacBride/install-package@v1
+    with:
+      apt: neofetch fish
+    if: ${{ runner.os == 'Linux' }}
   - uses: ConorMacBride/install-package@v1
     with:
       brew: fastfetch fish
     if: ${{ runner.os == 'macOS' }}
   - run: fastfetch
+    shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
+    if: ${{ runner.os == 'Windows' || runner.os == 'macOS' }}
+  - run: neofetch
     shell: bash
-    if: ${{ runner.os == 'macOS' }}
+    if: ${{ runner.os == 'Linux' }}
 
 
+  - run: pacman --noconfirm -S ffmpeg
+    shell: msys2 {0}
+    if: ${{ runner.os == 'Windows' && inputs.pgo-video != 'false' }}
+  - run: apt install -y ffmpeg
+    shell: msys2 {0}
+    if: ${{ runner.os == 'Linux' && inputs.pgo-video != 'false' }}
   - run: brew install ffmpeg
     shell: bash
     if: ${{ runner.os == 'macOS' && inputs.pgo-video != 'false' }}
@@ -64,16 +92,85 @@ runs:
       lfs: true
     if: ${{ inputs.pgo-video != 'false' }}
   - run: ffmpeg -i PGO.mkv -strict -1 -f yuv4mpegpipe -pix_fmt yuv420p10le PGO.y4m
-    shell: bash
+    shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
     working-directory: ${{ inputs.path }}/PGO
-    if: ${{ runner.os != 'Windows' && inputs.pgo-video != 'false' }}
+    if: ${{ inputs.pgo-video != 'false' }}
 
 
   - uses: ilammy/setup-nasm@v1
     if: ${{ runner.arch == 'X64' }}
+  - uses: ZhongRuoyu/setup-llvm@v0
+    if: ${{ (runner.os == 'Windows' && runner.arch == 'X64') || runner.os == 'Linux' }}
+  # This needs to be updated when we're approaching LLVM version 30. Hope ZhongRuoyu/setup-llvm supports Windows arm64 by then.
+  - id: install-llvm-30
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "30"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
+  - id: install-llvm-29
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "29"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-30.outcome == 'failure' }}
+  - id: install-llvm-28
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "28"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-29.outcome == 'failure' }}
+  - id: install-llvm-27
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "27"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-28.outcome == 'failure' }}
+  - id: install-llvm-26
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "26"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-27.outcome == 'failure' }}
+  - id: install-llvm-25
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "25"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-26.outcome == 'failure' }}
+  - id: install-llvm-24
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "24"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-25.outcome == 'failure' }}
+  - id: install-llvm-23
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "23"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-24.outcome == 'failure' }}
+  - id: install-llvm-22
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "22"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-23.outcome == 'failure' }}
+  - id: install-llvm-21
+    uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "21"
+    continue-on-error: true
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-22.outcome == 'failure' }}
+  - uses: KyleMayes/install-llvm-action@v2
+    with:
+      version: "20"
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && steps.install-llvm-21.outcome == 'failure' }}
   - run: brew install llvm lld
     shell: bash
     if: ${{ runner.os == 'macOS' }}
+  - uses: lukka/get-cmake@latest
+    if: ${{ runner.os == 'Windows' }}
 
 
   - uses: dtolnay/rust-toolchain@stable
@@ -102,15 +199,15 @@ runs:
   - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
     shell: bash
     working-directory: ${{ inputs.path }}/dovi_tool
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
+    if: ${{ runner.os == 'Linux' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
   - run: RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
     shell: bash
     working-directory: ${{ inputs.path }}/dovi_tool
-    if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
+    if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
   - run: RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
     shell: bash
     working-directory: ${{ inputs.path }}/dovi_tool
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
+    if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
   - uses: actions/checkout@v7
     with:
       path: ${{ inputs.path }}/hdr10plus_tool
@@ -118,27 +215,43 @@ runs:
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
   - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
     shell: msys2 {0}
-    working-directory: ${{ inputs.path }}/dovi_tool
+    working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
   - run: RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
     shell: msys2 {0}
-    working-directory: ${{ inputs.path }}/dovi_tool
+    working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
   - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
     shell: bash
-    working-directory: ${{ inputs.path }}/dovi_tool
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
+    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    if: ${{ runner.os == 'Linux' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
   - run: RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
     shell: bash
-    working-directory: ${{ inputs.path }}/dovi_tool
-    if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
+    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
   - run: RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
     shell: bash
-    working-directory: ${{ inputs.path }}/dovi_tool
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
+    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
 
 
-  - run: fish "$GITHUB_ACTION_PATH/macos-arm64.fish" --static=${{ inputs.static }} --shared=${{ inputs.shared }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --cxxflags-profiling=${{ inputs.cxxflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --cxxflags-final=${{ inputs.cxxflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
+  - run: fish "$GITHUB_ACTION_PATH/windows-x86-64.fish" --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters=${{ inputs.pgo-parameters }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
+    shell: msys2 {0}
+    working-directory: ${{ inputs.path }}
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
+  - run: fish "$GITHUB_ACTION_PATH/windows-arm64.fish" --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters=${{ inputs.pgo-parameters }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
+    shell: msys2 {0}
+    working-directory: ${{ inputs.path }}
+    if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
+  - run: fish "$GITHUB_ACTION_PATH/linux-x86-64.fish" --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters=${{ inputs.pgo-parameters }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
+    shell: bash
+    working-directory: ${{ inputs.path }}
+    if: ${{ runner.os == 'Linux' && runner.arch == 'X64' }}
+  - run: fish "$GITHUB_ACTION_PATH/macos-arm64.fish" --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters=${{ inputs.pgo-parameters }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
     shell: bash
     working-directory: ${{ inputs.path }}
     if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' }}
+  - run: fish "$GITHUB_ACTION_PATH/macos-x86-64.fish" --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters=${{ inputs.pgo-parameters }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
+    shell: bash
+    working-directory: ${{ inputs.path }}
+    if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
