@@ -1,8 +1,8 @@
 #!/usr/bin/env fish
 
+
 argparse "static=" "shared=" "pgo-parameters=" "base-arch-only=" "dovi-hdr10plus=" "ffms2=" "cmakeflags=" "cflags-profiling=" "ldflags-profiling=" "cflags-final=" "ldflags-final=" -- $argv
 or return $status
-
 
 echo "[build-svt-av1] Init"
 echo $_flag_static

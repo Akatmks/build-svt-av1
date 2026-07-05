@@ -1,8 +1,12 @@
 #!/usr/bin/env fish
 
+
+# `clang-cl` is broken when running in GitHub Actions and either the profiling run fails, or the final binary doesn't work. Using `clang` and `clang++` for now.
+# TODO: Test and migrate to MCF Gthread.
+
+
 argparse "static=" "shared=" "pgo-parameters=" "base-arch-only=" "dovi-hdr10plus=" "ffms2=" "cmakeflags=" "cflags-profiling=" "ldflags-profiling=" "cflags-final=" "ldflags-final=" -- $argv
 or return $status
-
 
 echo "[build-svt-av1] Init"
 echo $_flag_static
@@ -94,7 +98,8 @@ end
 function pgo_build
     set -g parameters parameters_(string replace - _ (string replace + _ $argv[1]))
 
-    rm -rf svt_build PGO/*.profraw PGO/*.profdata
+    set prof_files PGO/*.profraw PGO/*.profdata
+    rm -rf svt_build Build $prof_files
     or return $status
     ls PGO
 
@@ -113,6 +118,9 @@ function pgo_build
     mkdir -p BuildAction/$argv[1]
     or return $status
     if test $_flag_static != "false"
+        rm -rf svt_build Build
+        or return $status
+
         echo "[build-svt-av1] Final building static $argv[1]"
         $parameters static final
         build
@@ -129,7 +137,11 @@ function pgo_build
         or return $status
         BuildAction/$argv[1]/static/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $_flag_pgo_parameters --preset 4
         or return $status
-    else
+    end
+    if test $_flag_shared != "false"
+        rm -rf svt_build Build
+        or return $status
+
         echo "[build-svt-av1] Final building shared $argv[1]"
         $parameters shared final
         build
