@@ -43,7 +43,7 @@ runs:
   steps:
 
 
-  - uses: msys2/setup-msys2@v2
+  - uses: msys2/setup-msys2@v2.31.1
     with:
       msystem: UCRT64
       path-type: inherit
@@ -51,7 +51,7 @@ runs:
         mingw-w64-ucrt-x86_64-fastfetch
         fish
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
-  - uses: msys2/setup-msys2@v2
+  - uses: msys2/setup-msys2@v2.31.1
     with:
       msystem: CLANGARM64
       path-type: inherit
