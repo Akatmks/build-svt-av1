@@ -140,7 +140,7 @@ function pgo_build
         build
         or return $status
 
-        cp Bin/Release BuildAction/$argv[1]/static
+        cp -r Bin/Release BuildAction/$argv[1]/static
         or return $status
 
         echo "[build-svt-av1] Final static $argv[1]"
@@ -164,7 +164,7 @@ function pgo_build
         build
         or return $status
 
-        cp Bin/Release BuildAction/$argv[1]/shared
+        cp -r Bin/Release BuildAction/$argv[1]/shared
         or return $status
 
         echo "[build-svt-av1] Final shared $argv[1]"
