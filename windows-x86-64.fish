@@ -96,7 +96,7 @@ end
 
 # $argv[1]: directory string: "icelake-server+znver5", "znver2", "x86-64-v3+znver2"
 function pgo_build
-    set -g parameters parameters_(string replace - _ (string replace + _ $argv[1]))
+    set -g parameters parameters_(string replace --all - _ (string replace --all + _ $argv[1]))
 
     set prof_files PGO/*.profraw PGO/*.profdata
     rm -rf svt_build Build $prof_files
