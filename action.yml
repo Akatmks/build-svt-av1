@@ -39,11 +39,11 @@ inputs:
   ldflags-final:
     default: ""
 
-run:
+runs:
   using: composite
   steps:
 
-  
+
   - uses: ConorMacBride/install-package@v1
     with:
       brew: fastfetch fish
