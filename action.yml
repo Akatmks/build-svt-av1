@@ -1,0 +1,132 @@
+name: build-svt-av1
+description: Create highly optimised Windows, Linux, and macOS builds for SVT-AV1
+author: Akatsumekusa and contributors
+inputs:
+  path:
+    default: "."
+
+  static:
+    default: "true"
+
+  shared:
+    default: "false"
+
+  pgo-video:
+    default: "SolLevante"
+
+  base-arch-only:
+    default: "false"
+
+  dovi-hdr10plus:
+    default: "true"
+
+  ffms2:
+    default: "false"
+
+  cmakeflags:
+    default: ""
+
+  cflags-profiling:
+    default: ""
+  cxxflags-profiling:
+    default: ""
+  ldflags-profiling:
+    default: ""
+  cflags-final:
+    default: ""
+  cxxflags-final:
+    default: ""
+  ldflags-final:
+    default: ""
+
+run:
+  using: composite
+  steps:
+
+  
+  - uses: ConorMacBride/install-package@v1
+    with:
+      brew: fastfetch fish
+    if: ${{ runner.os == "macOS" }}
+  - run: fastfetch
+    if: ${{ runner.os == "macOS" }}
+
+
+  - uses: ConorMacBride/install-package@v1
+    with:
+      brew: ffmpeg
+    if: ${{ runner.os == "macOS" && inputs.pgo-video != "false" }}
+  - uses: actions/checkout@v7
+    with:
+      path: ${{ inputs.path }}/PGO
+      repository: Akatmks/build-svt-av1
+      ref: ${{ inputs.pgo-video }}
+    if: ${{ inputs.pgo-video != "false" }}
+  - run: ffmpeg -i PGO.mkv -strict -1 -f yuv4mpegpipe -pix_fmt yuv420p10le PGO.y4m
+    working-directory: ${{ inputs.path }}/PGO
+    if: ${{ runner.os != "Windows" && inputs.pgo-video != "false" }}
+
+
+  - uses: ilammy/setup-nasm@v1
+    if: ${{ runner.arch == "X64" }}
+  - uses: ConorMacBride/install-package@v1
+    with:
+      brew: llvm lld
+    if: ${{ runner.os == "macOS" }}
+
+
+  - uses: dtolnay/rust-toolchain@stable
+    if: ${{ inputs.dovi-hdr10plus != "false" }}
+  - uses: cargo-bins/cargo-binstall@main
+    if: ${{ inputs.dovi-hdr10plus != "false" }}
+  - run: cargo binstall cargo-c
+    if: ${{ inputs.dovi-hdr10plus != "false" }}
+  - uses: actions/checkout@v7
+    with:
+      path: ${{ inputs.path }}/dovi_tool
+      repository: quietvoid/dovi_tool
+    if: ${{ inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
+    shell: msys2 {0}
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "X64" && inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
+    shell: msys2 {0}
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "ARM64" && inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "X64" && inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "ARM64" && inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "X64" && inputs.dovi-hdr10plus != "false" }}
+  - uses: actions/checkout@v7
+    with:
+      path: ${{ inputs.path }}/hdr10plus_tool
+      repository: quietvoid/hdr10plus_tool
+    if: ${{ inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
+    shell: msys2 {0}
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "X64" && inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a BuildAction)"
+    shell: msys2 {0}
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "ARM64" && inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "X64" && inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "ARM64" && inputs.dovi-hdr10plus != "false" }}
+  - run: RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath BuildAction)"
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ runner.os == "Windows" && runner.arch == "X64" && inputs.dovi-hdr10plus != "false" }}
+
+
+  # - run: fish macos-arm64.fish --static=${{ inputs.static }} --shared=${{ inputs.shared }} --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags=${{ inputs.cmakeflags }} --cflags-profiling=${{ inputs.cflags-profiling }} --cxxflags-profiling=${{ inputs.cxxflags-profiling }} --ldflags-profiling=${{ inputs.ldflags-profiling }} --cflags-final=${{ inputs.cflags-final }} --cxxflags-final=${{ inputs.cxxflags-final }} --ldflags-final=${{ inputs.ldflags-final }}
+  #   working-directory: ${{ inputs.path }}
+  #   if: ${{ runner.os == "macOS" && runner.arch == "ARM64" }}
