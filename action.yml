@@ -206,11 +206,21 @@ runs:
   - run: cargo binstall cargo-c
     shell: bash
     if: ${{ runner.os != 'Windows' && inputs.dovi-hdr10plus != 'false' }}
-  - uses: actions/checkout@v7
+  - uses: robinraju/release-downloader@v1
     with:
-      path: ${{ inputs.path }}/dovi_tool
       repository: quietvoid/dovi_tool
+      tarBall: true
+      zipBall: false
+      out-file-path: ${{ inputs.path }}/dovi_tool
+      extract: true
+      extract-path: ${{ inputs.path }}/dovi_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
+  - run: ls
+    shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
+    working-directory: ${{ inputs.path }}/dovi_tool
+    if: ${{ inputs.dovi-hdr10plus != 'false' }}
+
+
   - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../BuildAction)"
     shell: msys2 {0}
     working-directory: ${{ inputs.path }}/dovi_tool
