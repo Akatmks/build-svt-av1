@@ -217,10 +217,6 @@ runs:
     shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
     working-directory: ${{ inputs.path }}/dovi_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
-  - run: ls
-    shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
-    working-directory: ${{ inputs.path }}/dovi_tool
-    if: ${{ inputs.dovi-hdr10plus != 'false' }}
   - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../BuildAction)"
     shell: msys2 {0}
     working-directory: ${{ inputs.path }}/dovi_tool
@@ -241,10 +237,16 @@ runs:
     shell: bash
     working-directory: ${{ inputs.path }}/dovi_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - uses: actions/checkout@v7
+  - uses: robinraju/release-downloader@v1
     with:
-      path: ${{ inputs.path }}/hdr10plus_tool
       repository: quietvoid/hdr10plus_tool
+      latest: true
+      tarBall: true
+      out-file-path: ${{ inputs.path }}/hdr10plus_tool
+    if: ${{ inputs.dovi-hdr10plus != 'false' }}
+  - run: tar -xz --strip-components=1 -f *.tar.gz
+    shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
+    working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
   - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../BuildAction)"
     shell: msys2 {0}
