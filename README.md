@@ -1,7 +1,7 @@
 # Akatmks/build-svt-av1
 
 This is a GitHub Action to build SVT-AV1 for Windows x86-64 & arm64, Linux x86-64, and macOS arm64 & x86-64.  
-By utilising the best compiler and best procedure, including LTO and PGO, this building script can create highly optimised builds within 1% of the best possible build.  
+By utilising the best compiler and best procedure, including LTO and PGO, this building script creates highly optimised builds within 1% of the best possible build.  
 
 SVT-AV1 variants and build repositories using this action or currently in the process of implementing this action:  
 – [5fish/SVT-AV1](https://github.com/5fish/SVT-AV1)  
@@ -93,7 +93,7 @@ BuildAction/[ARCH]/[STATIC]/[FILENAME]
   * For the app, it would be `SvtAv1EncApp.exe` on Windows, and `SvtAv1EncApp` on Unix.  
   * For the lib, it would the respective native filename for the system. You can directly `-L` to the directory as well.  
 
-You can also search for `[build-svt-av1] Result` in the logs. There will be a line starting with `[build-svt-av1] Result` for each `[ARCH]` and `[STATIC]` listing all the resulting binaries.  
+You can also search for `[build-svt-av1] Result` in the logs. There will be a list showing all the resulting binaries below the line `[build-svt-av1] Result` for each `[ARCH]` and `[STATIC]`.  
 
 ### Note
 
@@ -101,7 +101,7 @@ This is not a requirement, but when you're using this action to build anything, 
 ```
 Thanks to studies and contributions from afed, Emre, Ironclad, Itachi Uchiha, Khaoklong, Miss Ashenlight, Soda, SwareJonge, Trix, Yiss, and other people in the community for discovering the method to build the fastest binary.
 ```
-You may rephrase the sentence if needed.  
+You may rephrase or translate the sentence if needed.  
 You can also add additional names, including your own, to the list. The list is currently sorted in alphabetical order.  
 
 ### Maintainence
