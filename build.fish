@@ -67,7 +67,7 @@ function parameters_base
     set -g -a cmake_command -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
     set -g -a ldflags -fuse-ld=lld
     if test $os = "macOS"
-        set -g -a cmake_command -DCMAKE_PREFIX_PATH=$homebrew_llvm_prefix -DCMAKE_AR=$homebrew_llvm_prefix/bin/llvm-ar -DCMAKE_RANLIB=$homebrew_llvm_prefix/bin/llvm-ranlib -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_C_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ -L$homebrew_llvm_prefix/lib/unwind -lunwind" -DCMAKE_CXX_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ -L$homebrew_llvm_prefix/lib/unwind -lunwind"
+        set -g -a cmake_command -DCMAKE_PREFIX_PATH=$homebrew_llvm_prefix -DCMAKE_AR=$homebrew_llvm_prefix/bin/llvm-ar -DCMAKE_RANLIB=$homebrew_llvm_prefix/bin/llvm-ranlib -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_C_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ -L$homebrew_llvm_prefix/lib/unwind -l:libunwind.a" -DCMAKE_CXX_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ -L$homebrew_llvm_prefix/lib/unwind -l:libunwind.a"
         set -g -a cflags -D_LIBCPP_DISABLE_AVAILABILITY
     end
     
@@ -84,18 +84,19 @@ function parameters_base
     set -g -a cflags -DNDEBUG -O3 -fno-exceptions -fno-rtti -fno-stack-protector -fno-sanitize=all -fno-dwarf2-cfi-asm -Wno-deprecated
     if test $os = "Linux"
         set -g -a cflags -fno-semantic-interposition -fno-stack-clash-protection -fno-pic -fno-pie
-        set -g -a ldflags -Wl,-O3 -Wl,--as-needed -Wl,--gc-sections -Wl,--icf=all -Wl,--strip-all -Wl,-z,norelro -Wl,--build-id=none -Wl,--relax -Wl,-z,noseparate-code -Wl,-znow
+        set -g -a ldflags --rtlib=compiler-rt -Wl,-O3 -Wl,--as-needed -Wl,--gc-sections -Wl,--icf=all -Wl,--strip-all -Wl,-z,norelro -Wl,--build-id=none -Wl,--relax -Wl,-z,noseparate-code -Wl,-znow
     else if test $os = "macOS"
-        set -g -a ldflags -Wl,-O3
+        set -g -a ldflags --rtlib=compiler-rt -Wl,-O3
     end
 
     # dovi hdr10+
     if test $flag_dovi_hdr10plus != "false"
+        set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1
         if test $os != "Linux"
-            set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1 (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
+            set -g -a cflags (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
             set -g -a ldflags (pkg-config --libs --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
         else
-            set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1 (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
+            set -g -a cflags (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
             set -g -a ldflags (pkg-config --libs --static --dont-define-prefix dovi_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
         end
     end
@@ -197,7 +198,7 @@ function pgo_build
     or return $status
     find PGO -type f
 
-    echo "[build-svt-av1] Profiling building $argv[1]"
+    echo "[build-svt-av1] Building profiling $argv[1]"
     $parameters static profiling
     build
     or return $status
@@ -216,7 +217,7 @@ function pgo_build
             rm -rf svt_build Build
             or return $status
     
-            echo "[build-svt-av1] Final building $static $argv[1]"
+            echo "[build-svt-av1] Building final $static $argv[1]"
             $parameters $static final
             build
             or return $status
@@ -227,10 +228,12 @@ function pgo_build
             else
                 otool -L Bin/Release/SvtAv1EncApp
             end
-            Bin/Release/SvtAv1EncApp --help | grep dolby
-            or return $status
-            Bin/Release/SvtAv1EncApp --help | grep hdr10plus
-            or return $status
+            if test $flag_dovi_hdr10plus != "false"
+                Bin/Release/SvtAv1EncApp --help | grep dolby
+                or return $status
+                Bin/Release/SvtAv1EncApp --help | grep hdr10plus
+                or return $status
+            end
             Bin/Release/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $flag_pgo_parameters --preset 4
             or return $status
 
