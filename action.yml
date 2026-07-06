@@ -257,6 +257,6 @@ runs:
     if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
 
 
-  - run: fish "$GITHUB_ACTION_PATH/windows-x86-64.fish" --os=${{ runner.os }} --arch=${{ runner.arch }} --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters="${{ inputs.pgo-parameters }}" --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags="${{ inputs.cmakeflags }}" --cflags-profiling="${{ inputs.cflags-profiling }}" --ldflags-profiling="${{ inputs.ldflags-profiling }}" --cflags-final="${{ inputs.cflags-final }}" --ldflags-final="${{ inputs.ldflags-final }}"
+  - run: fish "$GITHUB_ACTION_PATH/build.fish" --os=${{ runner.os }} --arch=${{ runner.arch }} --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters="${{ inputs.pgo-parameters }}" --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags="${{ inputs.cmakeflags }}" --cflags-profiling="${{ inputs.cflags-profiling }}" --ldflags-profiling="${{ inputs.ldflags-profiling }}" --cflags-final="${{ inputs.cflags-final }}" --ldflags-final="${{ inputs.ldflags-final }}"
     shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
     working-directory: ${{ inputs.path }}
