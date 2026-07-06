@@ -60,7 +60,10 @@ function parameters_base
     set -g -a cmake_command cmake --fresh -B svt_build -G Ninja
     # [Windows] `clang-cl` is broken when running in GitHub Actions and either the profiling run fails, or the final binary doesn't work. Using `clang` and `clang++` for now.
     set -g -a cmake_command -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
-    set -g -a ldflags -fuse-ld=lld --rtlib=compiler-rt
+    set -g -a ldflags -fuse-ld=lld
+    if test $os != "Windows"
+        set -g -a ldflags --rtlib=compiler-rt
+    end
     if test $os = "macOS"
         set -g -a cmake_command -DCMAKE_PREFIX_PATH=$homebrew_llvm_prefix -DCMAKE_AR=$homebrew_llvm_prefix/bin/llvm-ar -DCMAKE_RANLIB=$homebrew_llvm_prefix/bin/llvm-ranlib -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_C_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ $homebrew_llvm_prefix/lib/unwind/libunwind.a" -DCMAKE_CXX_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ $homebrew_llvm_prefix/lib/unwind/libunwind.a"
         set -g -a cflags -D_LIBCPP_DISABLE_AVAILABILITY
