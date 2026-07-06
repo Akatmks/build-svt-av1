@@ -65,8 +65,7 @@ function parameters_base
         set -g -a ldflags --rtlib=compiler-rt
     end
     if test $os = "macOS"
-        set -g -a cmake_command -DCMAKE_PREFIX_PATH=$homebrew_llvm_prefix -DCMAKE_AR=$homebrew_llvm_prefix/bin/llvm-ar -DCMAKE_RANLIB=$homebrew_llvm_prefix/bin/llvm-ranlib -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_C_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ $homebrew_llvm_prefix/lib/unwind/libunwind.a" -DCMAKE_CXX_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ $homebrew_llvm_prefix/lib/unwind/libunwind.a"
-        set -g -a cflags -D_LIBCPP_DISABLE_AVAILABILITY
+        set -g -a cmake_command -DCMAKE_PREFIX_PATH=$homebrew_llvm_prefix -DCMAKE_AR=$homebrew_llvm_prefix/bin/llvm-ar -DCMAKE_RANLIB=$homebrew_llvm_prefix/bin/llvm-ranlib -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_C_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib" -DCMAKE_CXX_STANDARD_LIBRARIES="-L$homebrew_llvm_prefix/lib"
     end
     
     # base
