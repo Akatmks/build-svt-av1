@@ -13,15 +13,15 @@ set -g os $_flag_os
 set -g arch $_flag_arch
 set -g flag_static $_flag_static
 set -g flag_shared $_flag_shared
-set -g flag_pgo_parameters $_flag_pgo_parameters
+eval set -g flag_pgo_parameters $_flag_pgo_parameters
 set -g flag_base_arch_only $_flag_base_arch_only
 set -g flag_dovi_hdr10plus $_flag_dovi_hdr10plus
 set -g flag_ffms2 $_flag_ffms2
-set -g flag_cmakeflags $_flag_cmakeflags
-set -g flag_cflags_profiling $_flag_cflags_profiling
-set -g flag_ldflags_profiling $_flag_ldflags_profiling
-set -g flag_cflags_final $_flag_cflags_final
-set -g flag_ldflags_final $_flag_ldflags_final
+eval set -g flag_cmakeflags $_flag_cmakeflags
+eval set -g flag_cflags_profiling $_flag_cflags_profiling
+eval set -g flag_ldflags_profiling $_flag_ldflags_profiling
+eval set -g flag_cflags_final $_flag_cflags_final
+eval set -g flag_ldflags_final $_flag_ldflags_final
 
 echo "[build-svt-av1] Init"
 echo os: $os
@@ -67,9 +67,9 @@ function parameters_base
     set -g -a cmake_command -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
     set -g -a ldflags -fuse-ld=lld
     if test $os = "macOS"
-        set -g -a cmake_command -DCMAKE_PREFIX_PATH=$homebrew_llvm_prefix
-        set -g -a cflags -I$homebrew_llvm_prefix/include
-        set -g -a ldflags -L$homebrew_llvm_prefix/lib
+        set -g -a cmake_command -DCMAKE_PREFIX_PATH=$homebrew_llvm_prefix -DCMAKE_AR=$homebrew_llvm_prefix/bin/llvm-ar -DCMAKE_RANLIB=$homebrew_llvm_prefix/bin/llvm-ranlib -DCMAKE_C_STANDARD_LIBRARIES=$homebrew_llvm_prefix/lib -DCMAKE_CXX_STANDARD_LIBRARIES=$homebrew_llvm_prefix/lib -DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$homebrew_llvm_prefix/include
+        set -g -a cflags -I$homebrew_llvm_prefix/include -D_LIBCPP_DISABLE_AVAILABILITY
+        set -g -a ldflags -L$homebrew_llvm_prefix/lib -L$homebrew_llvm_prefix/lib/c++ -L$homebrew_llvm_prefix/lib/unwind -lunwind
     end
     
     # base
@@ -92,8 +92,13 @@ function parameters_base
 
     # dovi hdr10+
     if test $flag_dovi_hdr10plus != "false"
-        set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1 (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
-        set -g -a ldflags (pkg-config --libs --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
+        if test $os != "Linux"
+            set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1 (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
+            set -g -a ldflags (pkg-config --libs --static --dont-define-prefix dovi_tool/BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
+        else
+            set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1 (pkg-config --cflags --static --dont-define-prefix dovi_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
+            set -g -a ldflags (pkg-config --libs --static --dont-define-prefix dovi_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix hdr10plus_tool/BuildAction/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
+        end
     end
 
     # arch
@@ -103,18 +108,18 @@ function parameters_base
     set -g -a cflags $cflags_arch
 
     # LTO
-    if begin test $os = "macOS" ; and test $arch $arch = "ARM64" ; end
-        # [macOS arm64] For some reason manually specifying `-flto` is broken and doesn't link, so using `-DSVT_AV1_LTO=ON` for now.
-        set -g -a cmake_command -DSVT_AV1_LTO=ON
-    else
+    # if begin test $os = "macOS" ; and test $arch = "ARM64" ; end
+    #     # [macOS arm64] For some reason manually specifying `-flto` is broken and doesn't link, so using `-DSVT_AV1_LTO=ON` for now.
+    #     set -g -a cmake_command -DSVT_AV1_LTO=ON
+    # else
         set -g -a cmake_command -DSVT_AV1_LTO=OFF
-        if test $os = "Linux"
+        if test $os != "Linux"
+            set -g -a cflags -flto=full
+            set -g -a ldflags -flto=full
+        else
             # [Linux x86-64] `-flto=thin` should be faster than `-flto=full`.
             set -g -a cflags -flto=thin
             set -g -a ldflags -flto=thin
-        else
-            set -g -a cflags -flto=full
-            set -g -a ldflags -flto=full
         end
         set -g -a cflags -fwhole-program-vtables
         set -g -a ldflags -fwhole-program-vtables
@@ -125,7 +130,7 @@ function parameters_base
         if test $os != "Windows"
             set -g -a ldflags -Wl,--lto-O3
         end
-    end
+    # end
 
     # PGO
     if test $argv[2] = "profiling"
@@ -139,6 +144,7 @@ function parameters_base
     end
 
     # user
+    set -g -a cmake_command $flag_cmakeflags
     if test $argv[2] = "profiling"
         set -g -a cflags $flag_cflags_profiling
         set -g -a ldflags $flag_ldflags_profiling
@@ -146,7 +152,6 @@ function parameters_base
         set -g -a cflags $flag_cflags_final
         set -g -a ldflags $flag_ldflags_final
     end
-    set -g -a cmake_command -DCMAKE_C_FLAGS_RELEASE="$cflags" -DCMAKE_CXX_FLAGS_RELEASE="$cflags" -DCMAKE_EXE_LINKER_FLAGS_RELEASE="$ldflags" $flag_cmakeflags
 end
 
 # $argv[1]: static: "static", "shared"
@@ -177,8 +182,13 @@ function parameters_skylake
 end
 
 function build
-    echo $cmake_command
-    $cmake_command
+    if test $arch = "X64"
+        echo $cmake_command -DCMAKE_C_FLAGS_RELEASE="$cflags" -DCMAKE_CXX_FLAGS_RELEASE="$cflags" -DCMAKE_EXE_LINKER_FLAGS_RELEASE="$ldflags"
+        $cmake_command -DCMAKE_C_FLAGS_RELEASE="$cflags" -DCMAKE_CXX_FLAGS_RELEASE="$cflags" -DCMAKE_EXE_LINKER_FLAGS_RELEASE="$ldflags"
+    else
+        echo CFLAGS="$cflags" CXXFLAGS="$cflags" LDFLAGS="$ldflags" $cmake_command
+        CFLAGS="$cflags" CXXFLAGS="$cflags" LDFLAGS="$ldflags" $cmake_command
+    end
     and ninja -v -C svt_build
     or return $status
 end
@@ -191,7 +201,7 @@ function pgo_build
     set prof_files PGO/*.profraw PGO/*.profdata
     rm -rf svt_build Build $prof_files
     or return $status
-    ls PGO
+    find PGO -type f
 
     echo "[build-svt-av1] Profiling building $argv[1]"
     $parameters static profiling
@@ -199,61 +209,43 @@ function pgo_build
     or return $status
 
     echo "[build-svt-av1] Profiling $argv[1]"
-    eval Bin/Release/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null --preset 2 $flag_pgo_parameters
+    Bin/Release/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null --preset 2 $flag_pgo_parameters
     or return $status
     llvm-profdata merge -o PGO/default.profdata PGO/*.profraw
     or return $status
-    ls PGO
+    find PGO -type f
 
     mkdir -p BuildAction/$argv[1]
     or return $status
-    if test $flag_static != "false"
-        rm -rf svt_build Build
-        or return $status
-
-        echo "[build-svt-av1] Final building static $argv[1]"
-        $parameters static final
-        build
-        or return $status
-
-        cp -r Bin/Release BuildAction/$argv[1]/static
-        or return $status
-
-        echo "[build-svt-av1] Final static $argv[1]"
-        ldd BuildAction/$argv[1]/static/SvtAv1EncApp
-        BuildAction/$argv[1]/static/SvtAv1EncApp --help | grep dolby
-        or return $status
-        BuildAction/$argv[1]/static/SvtAv1EncApp --help | grep hdr10plus
-        or return $status
-        eval BuildAction/$argv[1]/static/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $flag_pgo_parameters --preset 4
-        or return $status
-
-        echo "[build-svt-av1] Result static $argv[1]"
-        find BuildAction/$argv[1]/static -name "*"
-    end
-    if test $flag_shared != "false"
-        rm -rf svt_build Build
-        or return $status
-
-        echo "[build-svt-av1] Final building shared $argv[1]"
-        $parameters shared final
-        build
-        or return $status
-
-        cp -r Bin/Release BuildAction/$argv[1]/shared
-        or return $status
-
-        echo "[build-svt-av1] Final shared $argv[1]"
-        ldd BuildAction/$argv[1]/shared/SvtAv1EncApp
-        BuildAction/$argv[1]/shared/SvtAv1EncApp --help | grep dolby
-        or return $status
-        BuildAction/$argv[1]/shared/SvtAv1EncApp --help | grep hdr10plus
-        or return $status
-        eval BuildAction/$argv[1]/shared/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $flag_pgo_parameters --preset 4
-        or return $status
-
-        echo "[build-svt-av1] Result shared $argv[1]"
-        find BuildAction/$argv[1]/shared -type f
+    for static in "static" "shared"
+        if test (eval echo \$flag_$static) != "false"
+            rm -rf svt_build Build
+            or return $status
+    
+            echo "[build-svt-av1] Final building $static $argv[1]"
+            $parameters $static final
+            build
+            or return $status
+    
+            mv Bin/Release BuildAction/$argv[1]/$static
+            or return $status
+    
+            echo "[build-svt-av1] Final $static $argv[1]"
+            if test $os != "macOS"
+                ldd BuildAction/$argv[1]/$static/SvtAv1EncApp
+            else
+                otool -L BuildAction/$argv[1]/$static/SvtAv1EncApp
+            end
+            BuildAction/$argv[1]/$static/SvtAv1EncApp --help | grep dolby
+            or return $status
+            BuildAction/$argv[1]/$static/SvtAv1EncApp --help | grep hdr10plus
+            or return $status
+            BuildAction/$argv[1]/$static/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $flag_pgo_parameters --preset 4
+            or return $status
+    
+            echo "[build-svt-av1] Result $static $argv[1]"
+            find BuildAction/$argv[1]/$static -type f
+        end
     end
 
     # [Linux x86-64] BOLT is currently having problems with fully static binaries, and making the binaries static outweigh the benefit of BOLT.
