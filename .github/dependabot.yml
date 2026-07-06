@@ -7,5 +7,3 @@ updates:
     interval: monthly
   cooldown:
     default-days: 30
-  allow:
-  - update-types: ["version-update:semver-major"]
