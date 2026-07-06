@@ -100,7 +100,7 @@ runs:
   - run: brew install ffmpeg
     shell: bash
     if: ${{ runner.os == 'macOS' && inputs.pgo-video != 'false' }}
-  - uses: actions/checkout@v7
+  - uses: actions/checkout@v6
     with:
       path: ${{ inputs.path }}/PGO
       repository: Akatmks/build-svt-av1
