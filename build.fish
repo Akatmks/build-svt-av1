@@ -196,7 +196,7 @@ function pgo_build
     set prof_files PGO/*.profraw PGO/*.profdata
     rm -rf svt_build Build $prof_files
     or return $status
-    find PGO -type f
+    find PGO -maxdepth 1
 
     echo "[build-svt-av1] Building profiling $argv[1]"
     $parameters static profiling
@@ -208,7 +208,7 @@ function pgo_build
     or return $status
     llvm-profdata merge -o PGO/default.profdata PGO/*.profraw
     or return $status
-    find PGO -type f
+    find PGO -maxdepth 1
 
     mkdir -p BuildAction/$argv[1]
     or return $status
