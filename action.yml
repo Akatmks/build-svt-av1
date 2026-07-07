@@ -327,8 +327,8 @@ runs:
       sed -i "s/grep -qE 'LNK4044|lld-link: warning: ignoring unknown argument'/false/" configure
       sed -i 's/echo zlib.lib ;;/echo zs.lib ;;/' configure
       
-      export INCLUDE="$(pwd)/../ext/include;$INCLUDE"
-      export LIB="$(pwd)/../ext/lib;$LIB"
+      export INCLUDE="$(cygpath -m "$(pwd)/../ext/include");$INCLUDE"
+      export LIB="$(cygpath -m "$(pwd)/../ext/lib");$LIB"
 
       ./configure \
           --prefix="$(pwd)/../ext" \
