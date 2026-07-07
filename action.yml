@@ -274,16 +274,21 @@ runs:
     with:
       path: ${{ inputs.path }}/ffms2
       repository: Uranite/ffms2
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+    if: ${{ runner.os == 'Windows' && inputs.ffms2 != 'false' }}
   - run: pip install meson ninja
     shell: pwsh
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+    if: ${{ runner.os == 'Windows' && inputs.ffms2 != 'false' }}
   - uses: ilammy/msvc-dev-cmd@v1
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+    if: ${{ runner.os == 'Windows' && inputs.ffms2 != 'false' }}
+    with:
+      arch: ${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
   - name: Build FFMS2 and dependencies
     shell: msys2 {0}
     working-directory: ${{ inputs.path }}/ffms2
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+    if: ${{ runner.os == 'Windows' && inputs.ffms2 != 'false' }}
+    env:
+      PACMAN_ARCH: ${{ runner.arch == 'ARM64' && 'clang-aarch64' || 'clang-x86_64' }}
+      ARCH_CFLAGS: ${{ runner.arch == 'ARM64' && '-march=armv8.7-a+crypto+sm4+sha3+fp16+sve+sve2 -mtune=oryon-1' || '-march=x86-64-v3 -mtune=znver2' }}
     run: |
       export CC="clang-cl"
       export CXX="clang-cl"
@@ -292,21 +297,21 @@ runs:
       export NM="llvm-nm"
       export RANLIB="llvm-ranlib"
       
-      pacman --noconfirm -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-ninja
+      pacman --noconfirm -S mingw-w64-${PACMAN_ARCH}-cmake mingw-w64-${PACMAN_ARCH}-pkgconf
       
       mkdir -p ext/lib
       mkdir -p ext/include
       
       git clone --depth 1 https://github.com/madler/zlib.git
       cd zlib
-      cmake --fresh -S . -B zlib_build -G Ninja -DZLIB_BUILD_SHARED=OFF -DZLIB_BUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_C_FLAGS_RELEASE="-flto -O3 -DNDEBUG -march=x86-64-v3 -mtune=znver2" -DCMAKE_INSTALL_PREFIX="$(pwd)/../ext"
+      cmake --fresh -S . -B zlib_build -G Ninja -DZLIB_BUILD_SHARED=OFF -DZLIB_BUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_C_FLAGS_RELEASE="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DCMAKE_INSTALL_PREFIX="$(pwd)/../ext"
       cmake --build zlib_build
       cmake --install zlib_build
       cd ..
 
       git clone --depth 1 https://code.videolan.org/videolan/dav1d.git
       cd dav1d
-      meson setup build --prefix="$(pwd)/../ext" --default-library=static --buildtype=release -Db_vscrt=mt -Db_lto=true -Doptimization=3 -Denable_tools=false -Denable_examples=false -Dc_args="-DNDEBUG -march=x86-64-v3 -mtune=znver2" -Dc_link_args="-fuse-ld=lld"
+      meson setup build --prefix="$(pwd)/../ext" --default-library=static --buildtype=release -Db_vscrt=mt -Db_lto=true -Doptimization=3 -Denable_tools=false -Denable_examples=false -Dc_args="-DNDEBUG ${ARCH_CFLAGS}" -Dc_link_args="-fuse-ld=lld"
       meson install -C build
       mv ../ext/lib/libdav1d.a ../ext/lib/dav1d.lib || true
       cd ..
@@ -321,7 +326,7 @@ runs:
       
       export INCLUDE="$(pwd)/../ext/include;$INCLUDE"
       export LIB="$(pwd)/../ext/lib;$LIB"
-      
+
       ./configure \
           --prefix="$(pwd)/../ext" \
           --cc="clang-cl" \
@@ -333,7 +338,7 @@ runs:
           --strip="llvm-strip" \
           --toolchain="msvc" \
           --enable-lto="full" \
-          --extra-cflags="-flto -DNDEBUG -march=x86-64-v3 -mtune=znver2 -O3" \
+          --extra-cflags="-flto -DNDEBUG ${ARCH_CFLAGS} -O3" \
           --extra-libs="dav1d.lib zs.lib" \
           --disable-shared \
           --enable-static \
@@ -351,7 +356,7 @@ runs:
           sed -i 's/ \([a-zA-Z0-9_\-]*\)\.lib/ -l\1/g' "$pc"
       done
 
-      cmake -S . -B build_ffms2 -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_AVISYNTH=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_CXX_FLAGS="-flto -O3 -DNDEBUG -march=x86-64-v3 -mtune=znver2" -DCMAKE_C_FLAGS="-flto -O3 -DNDEBUG -march=x86-64-v3 -mtune=znver2" -DFFMPEG_DIR="$(pwd)/ext" -DZLIB_LIBRARY="$(pwd)/ext/lib/zs.lib"
+      cmake -S . -B build_ffms2 -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_AVISYNTH=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_CXX_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DCMAKE_C_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DFFMPEG_DIR="$(pwd)/ext" -DZLIB_LIBRARY="$(pwd)/ext/lib/zs.lib"
       cmake --build build_ffms2
   - run: sudo apt install -y libffms2-5 libffms2-dev
     shell: bash
