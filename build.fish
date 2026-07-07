@@ -201,7 +201,7 @@ end
 
 function mangle_masOS_ffms2
     set -f ffms2_line "ffms2 match fails"
-    for line in string split "\n" (otool -L Bin/Release/SvtAv1EncApp)
+    for line in (string split "\n" (otool -L Bin/Release/SvtAv1EncApp))
         if string match --quiet "ffms2" $line
             set -f ffms2_line $line
             break
