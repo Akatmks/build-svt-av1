@@ -58,10 +58,10 @@ runs:
 
   - uses: msys2/setup-msys2@v2.31.1
     with:
-      msystem: UCRT64
+      msystem: CLANG64
       path-type: inherit
       install: >-
-        mingw-w64-ucrt-x86_64-fastfetch
+        mingw-w64-clang-x86_64-fastfetch
         fish
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
   - uses: msys2/setup-msys2@v2.31.1
@@ -88,7 +88,7 @@ runs:
     if: ${{ runner.os == 'Linux' }}
 
 
-  - run: pacman --noconfirm -S mingw-w64-ucrt-x86_64-ffmpeg
+  - run: pacman --noconfirm -S mingw-w64-clang-x86_64-ffmpeg
     shell: msys2 {0}
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.pgo-video != 'false' }}
   - run: pacman --noconfirm -S mingw-w64-clang-aarch64-ffmpeg
@@ -190,7 +190,7 @@ runs:
     if: ${{ runner.os == 'Windows' }}
 
 
-  - run: pacman --noconfirm -S mingw-w64-ucrt-x86_64-pkgconf
+  - run: pacman --noconfirm -S mingw-w64-clang-x86_64-pkgconf
     shell: msys2 {0}
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
   - run: pacman --noconfirm -S mingw-w64-clang-aarch64-pkgconf
