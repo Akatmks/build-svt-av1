@@ -199,6 +199,10 @@ function build
 end
 
 
+function mangle_Linux_ffms2
+    patchelf --replace-needed libffms2.so.5 libffms2.so Bin/Release/SvtAv1EncApp
+    or return $status
+end
 function mangle_masOS_ffms2
     set -f ffms2_line "ffms2 match fails"
     for line in (string split "\n" (otool -L Bin/Release/SvtAv1EncApp))
@@ -264,6 +268,10 @@ function pgo_build
             or return $status
 
             echo "[build-svt-av1] Final $static $argv[1]"
+            if begin test $os = "Linux" ; and test $ffms2 = "ffms2" ; end
+                mangle_Linux_ffms2
+                or return $status
+            end
             if begin test $os = "macOS" ; and test $ffms2 = "ffms2" ; end
                 mangle_masOS_ffms2
                 or return $status
