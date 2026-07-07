@@ -269,8 +269,10 @@ function pgo_build
                 or return $status
             end
 
-            if test $os != "macOS"
+            if test $os = "Windows"
                 ldd Bin/Release/SvtAv1EncApp
+            else if test $os = "Linux"
+                objdump -p Bin/Release/SvtAv1EncApp
             else
                 otool -L Bin/Release/SvtAv1EncApp
             end
