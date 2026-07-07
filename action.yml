@@ -349,7 +349,7 @@ runs:
           --disable-programs --disable-doc --disable-network --disable-autodetect \
           --disable-debug --disable-encoders --disable-muxers --disable-filters \
           --disable-avfilter --disable-devices --disable-hwaccels \
-          --enable-libdav1d --enable-zlib
+          --enable-libdav1d --enable-zlib || (cat ffbuild/config.log; exit 1)
       make -j$(nproc)
       make install
       cd ..
