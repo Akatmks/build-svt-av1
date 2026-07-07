@@ -207,9 +207,12 @@ function mangle_masOS_ffms2
             break
         end
     end
-    echo $ffms2_line
     test $ffms2_line != "ffms2 match fails"
-    or return $status
+    or begin
+        set status_ $status
+        otool -L Bin/Release/SvtAv1EncApp
+        return $status_
+    end
     set -f ffms2_path (string replace --regex "\\s*(.*?)\\s\\(.*" "\$1" $ffms2_line)
     install_name_tool -change $ffms2_path @rpath/libffms2.dylib -add_rpath (path dirname $ffms2_path) Bin/Release/SvtAv1EncApp
     or return $status

@@ -299,7 +299,7 @@ runs:
   - run: vcpkg integrate remove
     shell: pwsh
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  - run: sudo apt install -y libffms2-5
+  - run: sudo apt install -y libffms2-5 libffms2-dev
     shell: bash
     if: ${{ runner.os == 'Linux' && inputs.ffms2 != 'false' }}
   - run: brew install ffms2
