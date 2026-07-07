@@ -106,7 +106,8 @@ function parameters_base
             set -g -a cflags -I(cygpath -m -a ffms2/BuildAction/include)
             set -g -a ldflags (cygpath -m -a ffms2/BuildAction/lib/ffms2.lib)
         else if test $os != "Windows"
-            set -g -a ldflags -lffms2
+            set -g -a cflags (pkg-config --cflags ffms2)
+            set -g -a ldflags (pkg-config --libs ffms2)
         end
     end
 
