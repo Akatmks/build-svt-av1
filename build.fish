@@ -210,6 +210,7 @@ function mangle_masOS_ffms2
     test $ffms2_line != "ffms2 match fails"
     or begin
         set status_ $status
+        echo $ffms2_line
         otool -L Bin/Release/SvtAv1EncApp
         return $status_
     end
