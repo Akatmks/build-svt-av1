@@ -36,6 +36,7 @@ echo flag_ldflags_final: $flag_ldflags_final
 
 # $argv[1]: static: "static", "shared"
 # $argv[2]: PGO: "profiling", "final"
+# $argv[3]: ffms2: "ffms2", "base"
 function parameters_base
     if begin test $argv[1] != "static" ; and test $argv[1] != "shared" ; end
         echo "[parameters_base] unexpected argv[1]: $argv[1]"
@@ -98,6 +99,17 @@ function parameters_base
         end
     end
 
+    # ffms2
+    if test $argv[3] = "ffms2"
+        set -g -a cflags -DHAVE_FFMS2=1
+        if begin test $os = "Windows" ; and test $arch = "X64" ; end
+            set -g -a cflags -I(cygpath -m -a ffms2/BuildAction/include)
+            set -g -a ldflags (cygpath -m -a ffms2/BuildAction/lib/ffms2.lib)
+        else if test $os != "Windows"
+            set -g -a ldflags -lffms2
+        end
+    end
+
     # arch
     if test $arch = "X64"
         set -g -a cmake_command -DENABLE_AVX512=ON
@@ -145,32 +157,32 @@ function parameters_base
         set -g -a ldflags $flag_ldflags_final
     end
 end
-
 # $argv[1]: static: "static", "shared"
 # $argv[2]: PGO: "profiling", "final"
+# $argv[3]: ffms2: "ffms2", "base"
 function parameters_icelake_server_znver5
     set -g cflags_arch -march=icelake-server -mtune=znver5 -mprefer-vector-width=512
-    parameters_base $argv[1] $argv[2]
+    parameters_base $argv
 end
 function parameters_znver2
     set -g cflags_arch -march=znver2 -mtune=znver2
-    parameters_base $argv[1] $argv[2]
+    parameters_base $argv
 end
 function parameters_x86_64_v3_znver2
     set -g cflags_arch -march=x86-64-v3 -mtune=znver2 -mno-gather
-    parameters_base $argv[1] $argv[2]
+    parameters_base $argv
 end
 function parameters_armv8.7_a_crypto_sm4_sha3_fp16_sve_sve2_oryon_1
     set -g cflags_arch -march=armv8.7-a+crypto+sm4+sha3+fp16+sve+sve2 -mtune=oryon-1
-    parameters_base $argv[1] $argv[2]
+    parameters_base $argv
 end
 function parameters_armv8.5_a_simd_crypto_apple_m3
     set -g cflags_arch -march=armv8.5-a+simd+crypto -mtune=apple-m3
-    parameters_base $argv[1] $argv[2]
+    parameters_base $argv
 end
 function parameters_skylake
     set -g cflags_arch -march=skylake -mtune=skylake -mno-gather 
-    parameters_base $argv[1] $argv[2]
+    parameters_base $argv
 end
 
 function build
@@ -196,7 +208,7 @@ function pgo_build
     find PGO -maxdepth 1
 
     echo "[build-svt-av1] Building profiling $argv[1]"
-    $parameters static profiling
+    $parameters static profiling base
     build
     or return $status
 
@@ -207,15 +219,25 @@ function pgo_build
     or return $status
     find PGO -maxdepth 1
 
-    mkdir -p BuildAction/$argv[1]
-    or return $status
     for static in "static" "shared"
-        if test (eval echo \$flag_$static) != "false"
+        if test (eval echo \$flag_$static) = "false"
+            continue
+        end
+
+        for ffms2 in "base" (test $flag_ffms2 != "false" ; and echo "ffms2")
+            if test $flag_ffms2 != "false"
+                if begin test $os = "Windows" ; and test $arch = "X64" ; and test $ffms2 = "base" ; end
+                    continue
+                else if begin test $os = "Windows" ; and test $arch = "ARM64" ; and test $ffms2 = "ffms2" ; end
+                    continue
+                end
+            end
+
             rm -rf svt_build Build
             or return $status
     
             echo "[build-svt-av1] Building final $static $argv[1]"
-            $parameters $static final
+            $parameters $static final $ffms2
             build
             or return $status
     
@@ -234,12 +256,17 @@ function pgo_build
             Bin/Release/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $flag_pgo_parameters --preset 4
             or return $status
 
-            mv Bin/Release BuildAction/$argv[1]/$static
+            if test $flag_ffms2 = "false"
+                set -f output_directory BuildAction/$argv[1]/$static
+            else
+                set -f output_directory BuildAction/$argv[1]/$static/$ffms2
+            end
+            mkdir -p (path dirname $output_directory)
+            and mv Bin/Release $output_directory
             or return $status
-    
-            echo "[build-svt-av1] Result $static $argv[1]"
-            find BuildAction/$argv[1]/$static -type f
         end
+        echo "[build-svt-av1] Result $static $argv[1]"
+        find BuildAction/$argv[1]/$static -type f
     end
 
     # [Linux x86-64] BOLT is currently having problems with fully static binaries, and making the binaries static outweigh the benefit of BOLT.

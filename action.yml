@@ -100,7 +100,7 @@ runs:
   - run: brew install ffmpeg
     shell: bash
     if: ${{ runner.os == 'macOS' && inputs.pgo-video != 'false' }}
-  - uses: actions/checkout@v6.0.3
+  - uses: actions/checkout@v7
     with:
       path: ${{ inputs.path }}/PGO
       repository: Akatmks/build-svt-av1
@@ -268,6 +268,43 @@ runs:
     shell: bash
     working-directory: ${{ inputs.path }}/hdr10plus_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
+
+
+  - uses: microsoft/setup-msbuild@v3
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+  - uses: actions/checkout@v7
+    with:
+      path: ${{ inputs.path }}/ffms2
+      repository: FFMS/ffms2
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+  # Make sure to check ffms2's workflow file
+  - run: vcpkg install ffmpeg[avcodec,avdevice,avfilter,avformat,swresample,swscale,zlib,bzip2,core,dav1d,gpl,version3,lzma,openssl,xml2]:x64-windows-static
+    shell: pwsh
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+  - run: vcpkg integrate install
+    shell: pwsh
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+  - run: MSBuild.exe /m /t:Rebuild /p:Platform=x64 /p:PlatformToolset=v143 /p:ConfigurationType=StaticLibrary /p:Configuration=Release /p:AdditionalOptions="/arch:AVX2" "./build-msvc/ffms2.sln"
+    shell: pwsh
+    working-directory: ${{ inputs.path }}/ffms2
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+  - run: cmake -E copy_directory "build-msvc\bin\x64\Release" "BuildAction\lib"
+    shell: pwsh
+    working-directory: ${{ inputs.path }}/ffms2
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+  - run: cmake -E copy_directory "include" "BuildAction\include"
+    shell: pwsh
+    working-directory: ${{ inputs.path }}/ffms2
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+  - run: vcpkg integrate remove
+    shell: pwsh
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
+  - run: sudo apt install -y ffms2
+    shell: bash
+    if: ${{ runner.os == 'Linux' && inputs.ffms2 != 'false' }}
+  - run: brew install ffms2
+    shell: bash
+    if: ${{ runner.os == 'macOS' && inputs.ffms2 != 'false' }}
 
 
   - run: fish "$GITHUB_ACTION_PATH/build.fish" --os=${{ runner.os }} --arch=${{ runner.arch }} --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters="${{ inputs.pgo-parameters }}" --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags="${{ inputs.cmakeflags }}" --cflags-profiling="${{ inputs.cflags-profiling }}" --ldflags-profiling="${{ inputs.ldflags-profiling }}" --cflags-final="${{ inputs.cflags-final }}" --ldflags-final="${{ inputs.ldflags-final }}"
