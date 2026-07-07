@@ -316,9 +316,6 @@ runs:
       mv ../ext/lib/libdav1d.a ../ext/lib/dav1d.lib || true
       cd ..
 
-      export CC="clang-cl"
-      export CXX="clang-cl"
-
       git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git
       cd FFmpeg
       export PKG_CONFIG_PATH="$(pwd)/../ext/lib/pkgconfig:$PKG_CONFIG_PATH"
@@ -326,6 +323,7 @@ runs:
       sed -i 's/test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"/true/' configure
       sed -i "s/grep -qE 'LNK4044|lld-link: warning: ignoring unknown argument'/false/" configure
       sed -i 's/echo zlib.lib ;;/echo zs.lib ;;/' configure
+      sed -i 's|gsub(/\\\\/, "/");|gsub(/\\\\\\\\/, "/");|' configure
       
       export INCLUDE="$(cygpath -m "$(pwd)/../ext/include");$INCLUDE"
       export LIB="$(cygpath -m "$(pwd)/../ext/lib");$LIB"
