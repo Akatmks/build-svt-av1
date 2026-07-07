@@ -251,14 +251,6 @@ function pgo_build
         end
 
         for ffms2 in "base" (test $flag_ffms2 != "false" ; and echo "ffms2")
-            if test $flag_ffms2 != "false"
-                if begin test $os = "Windows" ; and test $arch = "X64" ; and test $ffms2 = "base" ; end
-                    continue
-                else if begin test $os = "Windows" ; and test $arch = "ARM64" ; and test $ffms2 = "ffms2" ; end
-                    continue
-                end
-            end
-
             rm -rf svt_build Build
             or return $status
     
