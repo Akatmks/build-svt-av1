@@ -307,43 +307,6 @@ runs:
     if: ${{ runner.os == 'macOS' && inputs.ffms2 != 'false' }}
 
 
-  - uses: microsoft/setup-msbuild@v3
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  - uses: actions/checkout@v7
-    with:
-      path: ${{ inputs.path }}/ffms2
-      repository: FFMS/ffms2
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  # Make sure to check ffms2's workflow file
-  - run: vcpkg install ffmpeg[avcodec,avdevice,avfilter,avformat,swresample,swscale,zlib,bzip2,core,dav1d,gpl,version3,lzma,openssl,xml2]:x64-windows-static
-    shell: pwsh
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  - run: vcpkg integrate install
-    shell: pwsh
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  - run: MSBuild.exe /m /t:Rebuild /p:Platform=x64 /p:PlatformToolset=v143 /p:ConfigurationType=StaticLibrary /p:Configuration=Release /p:AdditionalOptions="/arch:AVX2" "./build-msvc/ffms2.sln"
-    shell: pwsh
-    working-directory: ${{ inputs.path }}/ffms2
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  - run: cmake -E copy_directory "build-msvc\bin\x64\Release" "BuildAction\lib"
-    shell: pwsh
-    working-directory: ${{ inputs.path }}/ffms2
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  - run: cmake -E copy_directory "include" "BuildAction\include"
-    shell: pwsh
-    working-directory: ${{ inputs.path }}/ffms2
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  - run: vcpkg integrate remove
-    shell: pwsh
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
-  - run: sudo apt install -y ffms2
-    shell: bash
-    if: ${{ runner.os == 'Linux' && inputs.ffms2 != 'false' }}
-  - run: brew install ffms2
-    shell: bash
-    if: ${{ runner.os == 'macOS' && inputs.ffms2 != 'false' }}
-
-
   - run: sed -i "s/ --dirty / /g" Source/Lib/Codec/ConfigureGitVersion.cmake
     shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
     working-directory: ${{ inputs.path }}
