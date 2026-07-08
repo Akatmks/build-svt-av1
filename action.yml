@@ -281,15 +281,13 @@ runs:
     working-directory: ${{ inputs.path }}/ffms2
     if: ${{ runner.os == 'Windows' && inputs.ffms2 != 'false' }}
     env:
+      MSYSTEM: MSYS
       ARCH_CFLAGS: ${{ runner.arch == 'ARM64' && '-march=armv8.7-a+crypto+sm4+sha3+fp16+sve+sve2 -mtune=oryon-1' || '-march=x86-64-v3 -mtune=znver2' }}
     run: |
       export CC="clang"
       export CXX="clang++"
       
       pacman --noconfirm --needed -S pkgconf
-      
-      mkdir -p ext/lib
-      mkdir -p ext/include
       
       git clone --depth 1 https://github.com/madler/zlib.git
       cd zlib
