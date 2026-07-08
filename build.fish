@@ -44,6 +44,9 @@ function parameters_base
     if begin test $argv[2] != "profiling" ; and test $argv[2] != "final" ; end
         echo "[parameters_base] unexpected argv[2]: $argv[2]"
     end
+    if begin test $argv[3] != "ffms2" ; and test $argv[3] != "base" ; end
+        echo "[parameters_base] unexpected argv[3]: $argv[3]"
+    end
 
     set -g cmake_command
     set -g cflags
@@ -214,7 +217,7 @@ function mangle_masOS_ffms2
     test $ffms2_line != "ffms2 match fails"
     or begin
         set status_ $status
-        echo $ffms2_line
+        echo "[mangle_macOS_ffms2] $ffms2_line"
         otool -L Bin/Release/SvtAv1EncApp
         return $status_
     end
