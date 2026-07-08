@@ -358,8 +358,9 @@ runs:
           sed -i 's/ \([a-zA-Z0-9_\-]*\)\.lib/ -l\1/g' "$pc"
       done
 
-      cmake -S . -B build_ffms2 -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_AVISYNTH=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_CXX_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DCMAKE_C_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DFFMPEG_DIR="$(pwd)/ext" -DZLIB_LIBRARY="$(pwd)/ext/lib/zs.lib"
+      cmake -S . -B build_ffms2 -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_AVISYNTH=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_CXX_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DCMAKE_C_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DFFMPEG_DIR="$(pwd)/ext" -DZLIB_LIBRARY="$(pwd)/ext/lib/zs.lib" -DCMAKE_INSTALL_PREFIX="$(pwd)/ext"
       cmake --build build_ffms2
+      cmake --install build_ffms2
   - run: sudo apt install -y libffms2-5 libffms2-dev
     shell: bash
     if: ${{ runner.os == 'Linux' && inputs.ffms2 != 'false' }}
