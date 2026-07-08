@@ -1,6 +1,6 @@
 name: Build SVT-AV1
 description: Create highly optimised Windows, Linux, and macOS builds for SVT-AV1
-author: Akatsumekusa and contributors
+author: Akatsumekusa, Yiss, and contributors
 inputs:
   path:
     type: string
