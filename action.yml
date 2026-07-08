@@ -202,68 +202,68 @@ runs:
       repository: quietvoid/dovi_tool
       latest: true
       tarBall: true
-      out-file-path: ${{ inputs.path }}/dovi_tool
+      out-file-path: ${{ inputs.path }}/deps/src/dovi_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
   - run: tar -xz --strip-components=1 -f *.tar.gz
     shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
-    working-directory: ${{ inputs.path }}/dovi_tool
+    working-directory: ${{ inputs.path }}/deps/src/dovi_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
-  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../../BuildAction)"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../../install)"
     shell: msys2 {0}
-    working-directory: ${{ inputs.path }}/dovi_tool
+    working-directory: ${{ inputs.path }}/deps/src/dovi_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../../BuildAction)"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../../install)"
     shell: msys2 {0}
-    working-directory: ${{ inputs.path }}/dovi_tool
+    working-directory: ${{ inputs.path }}/deps/src/dovi_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/BuildAction"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/install"
     shell: bash
-    working-directory: ${{ inputs.path }}/dovi_tool
+    working-directory: ${{ inputs.path }}/deps/src/dovi_tool
     if: ${{ runner.os == 'Linux' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/BuildAction"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/install"
     shell: bash
-    working-directory: ${{ inputs.path }}/dovi_tool
+    working-directory: ${{ inputs.path }}/deps/src/dovi_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/BuildAction"
+  - run: cd dolby_vision && RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/install"
     shell: bash
-    working-directory: ${{ inputs.path }}/dovi_tool
+    working-directory: ${{ inputs.path }}/deps/src/dovi_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
   - uses: robinraju/release-downloader@v1
     with:
       repository: quietvoid/hdr10plus_tool
       latest: true
       tarBall: true
-      out-file-path: ${{ inputs.path }}/hdr10plus_tool
+      out-file-path: ${{ inputs.path }}/deps/src/hdr10plus_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
   - run: tar -xz --strip-components=1 -f *.tar.gz
     shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
-    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    working-directory: ${{ inputs.path }}/deps/src/hdr10plus_tool
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
-  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../../BuildAction)"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../../install)"
     shell: msys2 {0}
-    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    working-directory: ${{ inputs.path }}/deps/src/hdr10plus_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../../BuildAction)"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=oryon-1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(cygpath -m -a ../../install)"
     shell: msys2 {0}
-    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    working-directory: ${{ inputs.path }}/deps/src/hdr10plus_tool
     if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/BuildAction"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=x86-64-v3 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/install"
     shell: bash
-    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    working-directory: ${{ inputs.path }}/deps/src/hdr10plus_tool
     if: ${{ runner.os == 'Linux' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/BuildAction"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=apple-m1 -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/install"
     shell: bash
-    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    working-directory: ${{ inputs.path }}/deps/src/hdr10plus_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
-  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/BuildAction"
+  - run: cd hdr10plus && RUSTFLAGS="-Ctarget-cpu=skylake -Copt-level=3" cargo cinstall --verbose --release --library-type staticlib --prefix "$(realpath ../..)/install"
     shell: bash
-    working-directory: ${{ inputs.path }}/hdr10plus_tool
+    working-directory: ${{ inputs.path }}/deps/src/hdr10plus_tool
     if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
 
 
   - uses: actions/checkout@v7
     with:
-      path: ${{ inputs.path }}/ffms2
+      path: ${{ inputs.path }}/deps/src/ffms2
       repository: Uranite/ffms2
     if: ${{ runner.os == 'Windows' && inputs.ffms2 != 'false' }}
   - run: pip install meson
@@ -275,7 +275,7 @@ runs:
       arch: ${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
   - name: Build FFMS2 and dependencies
     shell: msys2 {0}
-    working-directory: ${{ inputs.path }}
+    working-directory: ${{ inputs.path }}/deps/src
     if: ${{ runner.os == 'Windows' && inputs.ffms2 != 'false' }}
     env:
       PACMAN_ARCH: ${{ runner.arch == 'ARM64' && 'clang-aarch64' || 'clang-x86_64' }}
@@ -288,32 +288,32 @@ runs:
       
       git clone --depth 1 https://github.com/madler/zlib.git
       cd zlib
-      cmake --fresh -B zlib_build -G Ninja -DZLIB_BUILD_SHARED=OFF -DZLIB_BUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_C_FLAGS_RELEASE="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DCMAKE_INSTALL_PREFIX="$(pwd)/../BuildAction"
+      cmake --fresh -B zlib_build -G Ninja -DZLIB_BUILD_SHARED=OFF -DZLIB_BUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_C_FLAGS_RELEASE="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DCMAKE_INSTALL_PREFIX="$(pwd)/../../install"
       cmake --build zlib_build
       cmake --install zlib_build
       cd ..
       
       git clone --depth 1 https://code.videolan.org/videolan/dav1d.git
       cd dav1d
-      meson setup build --prefix="$(pwd)/../BuildAction" --default-library=static --buildtype=release -Db_vscrt=mt -Db_lto=true -Doptimization=3 -Denable_tools=false -Denable_examples=false -Dc_args="-DNDEBUG ${ARCH_CFLAGS}" -Dc_link_args="-fuse-ld=lld"
+      meson setup build --prefix="$(pwd)/../../install" --default-library=static --buildtype=release -Db_vscrt=mt -Db_lto=true -Doptimization=3 -Denable_tools=false -Denable_examples=false -Dc_args="-DNDEBUG ${ARCH_CFLAGS}" -Dc_link_args="-fuse-ld=lld"
       meson install -C build
-      mv ../BuildAction/lib/libdav1d.a ../BuildAction/lib/dav1d.lib || true
+      mv ../../install/lib/libdav1d.a ../../install/lib/dav1d.lib || true
       cd ..
       
       git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git
       cd FFmpeg
-      export PKG_CONFIG_PATH="$(pwd)/../BuildAction/lib/pkgconfig:$PKG_CONFIG_PATH"
+      export PKG_CONFIG_PATH="$(pwd)/../../install/lib/pkgconfig:$PKG_CONFIG_PATH"
       sed -i 's/if test "$cc_type" = "clang"; then/if true; then/' configure
       sed -i 's/test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"/true/' configure
       sed -i "s/grep -qE 'LNK4044|lld-link: warning: ignoring unknown argument'/false/" configure
       sed -i 's/echo zlib.lib ;;/echo zs.lib ;;/' configure
       sed -i 's|gsub(/\\\\/, "/");|gsub(/\\\\\\\\/, "/");|' configure
       
-      export INCLUDE="$(cygpath -m "$(pwd)/../BuildAction/include");$INCLUDE"
-      export LIB="$(cygpath -m "$(pwd)/../BuildAction/lib");$LIB"
+      export INCLUDE="$(cygpath -m "$(pwd)/../../install/include");$INCLUDE"
+      export LIB="$(cygpath -m "$(pwd)/../../install/lib");$LIB"
       
       ./configure \
-          --prefix="$(pwd)/../BuildAction" \
+          --prefix="$(pwd)/../../install" \
           --cc="clang-cl" \
           --cxx="clang-cl" \
           --as="clang-cl" \
@@ -337,13 +337,13 @@ runs:
       make install
       cd ..
       
-      for pc in BuildAction/lib/pkgconfig/*.pc; do
+      for pc in ../../install/lib/pkgconfig/*.pc; do
           sed -i 's/-libpath:/-L/g' "$pc"
           sed -i 's/ \([a-zA-Z0-9_\-]*\)\.lib/ -l\1/g' "$pc"
       done
       
       cd ffms2
-      cmake -B build_ffms2 -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_AVISYNTH=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_CXX_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DCMAKE_C_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DFFMPEG_DIR="$(pwd)/../BuildAction" -DZLIB_LIBRARY="$(pwd)/../BuildAction/lib/zs.lib" -DCMAKE_INSTALL_PREFIX="$(pwd)/../BuildAction"
+      cmake -B build_ffms2 -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_AVISYNTH=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DCMAKE_CXX_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DCMAKE_C_FLAGS="-flto -O3 -DNDEBUG ${ARCH_CFLAGS}" -DFFMPEG_DIR="$(pwd)/../../install" -DZLIB_LIBRARY="$(pwd)/../../install/lib/zs.lib" -DCMAKE_INSTALL_PREFIX="$(pwd)/../../install"
       cmake --build build_ffms2
       cmake --install build_ffms2
   - run: sudo apt install -y libffms2-5 libffms2-dev

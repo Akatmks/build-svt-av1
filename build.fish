@@ -94,11 +94,11 @@ function parameters_base
     if test $flag_dovi_hdr10plus != "false"
         set -g -a cflags -DLIBDOVI_FOUND=1 -DLIBHDR10PLUS_RS_FOUND=1
         if test $os != "Linux"
-            set -g -a cflags (pkg-config --cflags --static --dont-define-prefix BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
-            set -g -a ldflags (pkg-config --libs --static --dont-define-prefix BuildAction/lib/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix BuildAction/lib/pkgconfig/hdr10plus-rs.pc)
+            set -g -a cflags (pkg-config --cflags --static --dont-define-prefix deps/install/lib/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix deps/install/lib/pkgconfig/hdr10plus-rs.pc)
+            set -g -a ldflags (pkg-config --libs --static --dont-define-prefix deps/install/lib/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix deps/install/lib/pkgconfig/hdr10plus-rs.pc)
         else
-            set -g -a cflags (pkg-config --cflags --static --dont-define-prefix BuildAction/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix BuildAction/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
-            set -g -a ldflags (pkg-config --libs --static --dont-define-prefix BuildAction/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix BuildAction/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
+            set -g -a cflags (pkg-config --cflags --static --dont-define-prefix deps/install/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --cflags --static --dont-define-prefix deps/install/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
+            set -g -a ldflags (pkg-config --libs --static --dont-define-prefix deps/install/lib/x86_64-linux-gnu/pkgconfig/dovi.pc) (pkg-config --libs --static --dont-define-prefix deps/install/lib/x86_64-linux-gnu/pkgconfig/hdr10plus-rs.pc)
         end
     end
 
@@ -106,7 +106,7 @@ function parameters_base
     if test $argv[3] = "ffms2"
         if test $os = "Windows"
             set -g -a cmake_command -DUSE_FFMS2=ON -DEXT_LIB_STATIC=ON
-            set -x PKG_CONFIG_PATH (cygpath -u -a BuildAction/lib/pkgconfig)
+            set -x PKG_CONFIG_PATH (cygpath -u -a deps/install/lib/pkgconfig)
         else if test $os != "Windows"
             set -g -a cflags -DHAVE_FFMS2=1
             set -g -a cflags (pkg-config --cflags ffms2)
