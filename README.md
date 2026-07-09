@@ -71,7 +71,7 @@ Make sure you check the Maintainence section at the end.
     cmakeflags: ""
 
     # Additional CFLAGS (CXXFLAGS), LDFLAGS for profiling and final build.
-    # If you need to use spaces in the parameters, omit the yml quotation marks and use `cflags-profiling: -DFOO="BAR BAZ"`
+    # If you need to use spaces in the parameters, omit the yml quotation and use `cflags-profiling: -DFOO="BAR BAZ"`. Avoid using apostrophe.
     # Default: ""
     cflags-profiling: ""
     ldflags-profiling: ""
