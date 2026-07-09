@@ -179,14 +179,14 @@ runs:
     if: ${{ runner.os == 'macOS' }}
   - uses: lukka/get-cmake@latest
     if: ${{ runner.os == 'Windows' }}
-
-
   - run: pacman --noconfirm -S mingw-w64-clang-x86_64-pkgconf
     shell: msys2 {0}
-    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' && inputs.dovi-hdr10plus != 'false' }}
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
   - run: pacman --noconfirm -S mingw-w64-clang-aarch64-pkgconf
     shell: msys2 {0}
-    if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && inputs.dovi-hdr10plus != 'false' }}
+    if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
+
+
   - uses: dtolnay/rust-toolchain@stable
     if: ${{ inputs.dovi-hdr10plus != 'false' }}
   - uses: cargo-bins/cargo-binstall@main
@@ -278,13 +278,10 @@ runs:
     working-directory: ${{ inputs.path }}/deps/src
     if: ${{ runner.os == 'Windows' && inputs.ffms2 != 'false' }}
     env:
-      PACMAN_ARCH: ${{ runner.arch == 'ARM64' && 'clang-aarch64' || 'clang-x86_64' }}
       ARCH_CFLAGS: ${{ runner.arch == 'ARM64' && '-march=armv8.7-a+crypto+sm4+sha3+fp16+sve+sve2 -mtune=oryon-1' || '-march=x86-64-v3 -mtune=znver2' }}
     run: |
       export CC="clang"
       export CXX="clang++"
-      
-      pacman --noconfirm --needed -S mingw-w64-${PACMAN_ARCH}-pkgconf
       
       git clone --depth 1 https://github.com/madler/zlib.git
       cd zlib
