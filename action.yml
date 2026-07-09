@@ -377,7 +377,7 @@ runs:
       echo 'eval set -g flag_ldflags_final ${{ inputs.ldflags-final }}' >> $GITHUB_ACTION_PATH/build.params.fish
     shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
     working-directory: ${{ inputs.path }}
-  - run: $env:MSYSTEM = "UCRT64"; msys2 -c "fish `"$GITHUB_ACTION_PATH/build.fish`""
+  - run: $env:MSYSTEM = "UCRT64"; msys2 -c "fish `"`$GITHUB_ACTION_PATH/build.fish`""
     shell: pwsh
     working-directory: ${{ inputs.path }}
     if: ${{ runner.os == 'Windows' }}
