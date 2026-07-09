@@ -60,7 +60,7 @@ Make sure you check the Maintainence section at the end.
     dovi-hdr10plus: "true"
 
     # Build FFMS2 into the app.
-    # On Windows, FFMS2 will always be statically linked. Only FFMS2 binaries will be built.
+    # On Windows, FFMS2 will be statically linked. Only FFMS2 binaries will be built.
     # On Linux and macOS, SVT-AV1 will link dynamically to system FFMS2. Both FFMS2 and non-FFMS2 binaries will be built.
     # Default: "false"
     ffms2: "false"
