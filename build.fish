@@ -4,19 +4,7 @@
 argparse "os=" "arch=" "static=" "shared=" "pgo-parameters=" "base-arch-only=" "dovi-hdr10plus=" "ffms2=" "cmakeflags=" "cflags-profiling=" "ldflags-profiling=" "cflags-final=" "ldflags-final=" -- $argv
 or return $status
 
-set -g os $_flag_os
-set -g arch $_flag_arch
-set -g flag_static $_flag_static
-set -g flag_shared $_flag_shared
-eval set -g flag_pgo_parameters $_flag_pgo_parameters
-set -g flag_base_arch_only $_flag_base_arch_only
-set -g flag_dovi_hdr10plus $_flag_dovi_hdr10plus
-set -g flag_ffms2 $_flag_ffms2
-eval set -g flag_cmakeflags $_flag_cmakeflags
-eval set -g flag_cflags_profiling $_flag_cflags_profiling
-eval set -g flag_ldflags_profiling $_flag_ldflags_profiling
-eval set -g flag_cflags_final $_flag_cflags_final
-eval set -g flag_ldflags_final $_flag_ldflags_final
+source (status dirname)/build.params.fish
 
 echo "[build-svt-av1] Init"
 echo os: $os

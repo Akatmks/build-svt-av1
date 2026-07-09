@@ -179,7 +179,7 @@ runs:
     if: ${{ runner.os == 'macOS' }}
   - uses: lukka/get-cmake@latest
     if: ${{ runner.os == 'Windows' }}
-  - run: pacman --noconfirm -S --needed mingw-w64-clang-x86_64-pkgconf
+  - run: pacman --noconfirm -S --needed mingw-w64-clang-x86_64-pkgconf mingw-w64-ucrt-x86_64-pkgconf
     shell: msys2 {0}
     if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
   - run: pacman --noconfirm -S --needed mingw-w64-clang-aarch64-pkgconf
@@ -361,6 +361,27 @@ runs:
     working-directory: ${{ inputs.path }}
     continue-on-error: true
     if: ${{ runner.os == 'macOS' }}
-  - run: fish "$GITHUB_ACTION_PATH/build.fish" --os=${{ runner.os }} --arch=${{ runner.arch }} --static=${{ inputs.static }} --shared=${{ inputs.shared }} --pgo-parameters='${{ inputs.pgo-parameters }}' --base-arch-only=${{ inputs.base-arch-only }} --dovi-hdr10plus=${{ inputs.dovi-hdr10plus }} --ffms2=${{ inputs.ffms2 }} --cmakeflags='${{ inputs.cmakeflags }}' --cflags-profiling='${{ inputs.cflags-profiling }}' --ldflags-profiling='${{ inputs.ldflags-profiling }}' --cflags-final='${{ inputs.cflags-final }}' --ldflags-final='${{ inputs.ldflags-final }}'
+  - run: |
+      echo 'set -g os ${{ runner.os }}' > $GITHUB_ACTION_PATH/build.params.fish
+      echo 'set -g arch ${{ runner.arch }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'set -g flag_static ${{ inputs.static }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'set -g flag_shared ${{ inputs.shared }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'eval set -g flag_pgo_parameters ${{ inputs.pgo-parameters }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'set -g flag_base_arch_only ${{ inputs.base-arch-only }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'set -g flag_dovi_hdr10plus ${{ inputs.dovi-hdr10plus }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'set -g flag_ffms2 ${{ inputs.ffms2 }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'eval set -g flag_cmakeflags ${{ inputs.cmakeflags }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'eval set -g flag_cflags_profiling ${{ inputs.cflags-profiling }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'eval set -g flag_ldflags_profiling ${{ inputs.ldflags-profiling }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'eval set -g flag_cflags_final ${{ inputs.cflags-final }}' >> $GITHUB_ACTION_PATH/build.params.fish
+      echo 'eval set -g flag_ldflags_final ${{ inputs.ldflags-final }}' >> $GITHUB_ACTION_PATH/build.params.fish
     shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
     working-directory: ${{ inputs.path }}
+  - run: MSYSTEM=UCRT64 msys2 -c "fish \"$GITHUB_ACTION_PATH/build.fish\""
+    shell: msys2 {0}
+    working-directory: ${{ inputs.path }}
+    if: ${{ runner.os == 'Windows' }}
+  - run: fish "$GITHUB_ACTION_PATH/build.fish"
+    shell: bash
+    working-directory: ${{ inputs.path }}
+    if: ${{ runner.os != 'Windows' }}
