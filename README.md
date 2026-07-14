@@ -1,7 +1,7 @@
 # Akatmks/build-svt-av1@v1
 
 This is a GitHub Action to build SVT-AV1 for Windows x86-64 & arm64, Linux x86-64, and macOS arm64 & x86-64.  
-By utilising the best compiler and best procedure, including LTO and PGO, this building script creates highly optimised builds within 1% of the best possible build.  
+By utilising the best compiler and best procedure, including LTO and PGO, this building script creates highly optimised builds within 2% of the best possible build.  
 
 SVT-AV1 variants and build repositories using this action or currently in the process of implementing this action:  
 – [5fish/SVT-AV1](https://github.com/5fish/SVT-AV1)  
