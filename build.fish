@@ -287,8 +287,10 @@ function pgo_build
             end
             if test $flag_dovi_hdr10plus != "false"
                 Bin/Release/SvtAv1EncApp --help | grep dolby
+                or Bin/Release/SvtAv1EncApp --full-help | grep dolby
                 or return $status
                 Bin/Release/SvtAv1EncApp --help | grep hdr10plus
+                or Bin/Release/SvtAv1EncApp --full-help | grep hdr10plus
                 or return $status
             end
             Bin/Release/SvtAv1EncApp -i PGO/PGO.y4m -b /dev/null $flag_pgo_parameters --preset 4
