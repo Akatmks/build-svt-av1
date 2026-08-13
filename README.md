@@ -3,11 +3,14 @@
 This is a GitHub Action to build SVT-AV1 for Windows x86-64 & arm64, Linux x86-64, and macOS arm64 & x86-64.  
 By utilising the best compiler and best procedure, including LTO and PGO, this building script creates highly optimised builds within 2% of the best possible build.  
 
-SVT-AV1 variants and build repositories using this action or currently in the process of implementing this action:  
+SVT-AV1 variants and build repositories using this action:  
 – [5fish/SVT-AV1](https://github.com/5fish/SVT-AV1)  
 – [SVT-AV1-HDR](https://github.com/juliobbv-p/svt-av1-hdr)  
 – [SVT-AV1-Tritium](https://github.com/Uranite/svt-av1-tritium)  
 – [Akatmks/SVT-AV1-Builds](https://github.com/Akatmks/SVT-AV1-Builds)  
+
+Tools based on libSvtAv1 using this action:  
+– [Akatmks/vapoursynth-cdef](https://github.com/Akatmks/vapoursynth-cdef)  
 
 ## Usage
 
