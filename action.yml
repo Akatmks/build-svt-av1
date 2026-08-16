@@ -307,6 +307,7 @@ runs:
       sed -i 's/test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"/true/' configure
       sed -i 's/echo zlib.lib ;;/echo zs.lib ;;/' configure
       sed -i 's|gsub(/\\\\/, "/");|gsub(/\\\\\\\\/, "/");|' configure
+      sed -i 's|$(Q)echo $^ > $@.objs|$(file >$@.objs,$^)|' ffbuild/library.mak
       
       export INCLUDE="$(cygpath -m "$(pwd)/../../install/include");$INCLUDE"
       export LIB="$(cygpath -m "$(pwd)/../../install/lib");$LIB"
