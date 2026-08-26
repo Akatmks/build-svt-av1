@@ -110,7 +110,11 @@ runs:
   - uses: ilammy/setup-nasm@v1
     if: ${{ runner.arch == 'X64' }}
   - uses: ZhongRuoyu/setup-llvm@v0
-    if: ${{ runner.os != 'macOS' }}
+    with:
+      llvm-version: 22
+    if: ${{ runner.os == 'Windows' }}
+  - uses: ZhongRuoyu/setup-llvm@v0
+    if: ${{ runner.os == 'Linux' }}
   # Remeber to check latest Homebrew LLVM weirdness
   - run: brew install llvm lld
     shell: bash
