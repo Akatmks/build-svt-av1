@@ -112,9 +112,9 @@ runs:
   - uses: ZhongRuoyu/setup-llvm@v0
     with:
       llvm-version: 22
-    if: ${{ runner.os == 'Windows' }}
+    if: ${{ runner.os == 'Windows' && runner.arch == 'X64' }}
   - uses: ZhongRuoyu/setup-llvm@v0
-    if: ${{ runner.os == 'Linux' }}
+    if: ${{ (runner.os == 'Windows' && runner.arch == 'ARM64') || runner.os == 'Linux' }}
   # Remeber to check latest Homebrew LLVM weirdness
   - run: brew install llvm lld
     shell: bash
