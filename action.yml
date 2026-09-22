@@ -119,7 +119,7 @@ runs:
   - run: brew install llvm lld
     shell: bash
     if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' }}
-  - run: brew install llvm@22 lld@22
+  - run: brew install --build-from-source llvm lld
     shell: bash
     if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
   - uses: lukka/get-cmake@latest
@@ -293,7 +293,10 @@ runs:
     if: ${{ runner.os == 'Linux' && inputs.ffms2 != 'false' }}
   - run: brew install ffms2
     shell: bash
-    if: ${{ runner.os == 'macOS' && inputs.ffms2 != 'false' }}
+    if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && inputs.ffms2 != 'false' }}
+  - run: brew install --build-from-source ffms2
+    shell: bash
+    if: ${{ runner.os == 'macOS' && runner.arch == 'X64' && inputs.ffms2 != 'false' }}
 
 
   - run: sed -i "s/ --dirty / /g" Source/Lib/Codec/ConfigureGitVersion.cmake
