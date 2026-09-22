@@ -118,7 +118,10 @@ runs:
   # Remeber to check latest Homebrew LLVM weirdness
   - run: brew install llvm lld
     shell: bash
-    if: ${{ runner.os == 'macOS' }}
+    if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' }}
+  - run: brew install llvm@22 lld@22
+    shell: bash
+    if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
   - uses: lukka/get-cmake@latest
     if: ${{ runner.os == 'Windows' }}
   - run: pacman --noconfirm -S --needed mingw-w64-clang-x86_64-pkgconf
