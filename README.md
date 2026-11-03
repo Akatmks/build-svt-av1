@@ -24,7 +24,7 @@ Make sure you check the Maintainence section at the end.
 ### Reference  
 
 ```yml
-- uses: Akatmks/build-svt-av1@v1
+- uses: Akatmks/build-svt-av1@v2
   with:
     # Path to SVT-AV1 repository.
     # Ideally the absolute path to the repository should not contain any spaces or any characters that will confuse POSIX shell.
